@@ -20,7 +20,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { mainListItems, secondaryListItems } from './listItems';
 import Table from './table.component';
-import AuthService from "./../services/auth.service";
+import AuthService from "../services/auth.service";
 import {useNavigate } from "react-router-dom";
 
 function Copyright(props: any) {

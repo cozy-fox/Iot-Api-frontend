@@ -1,11 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -13,37 +12,26 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Navigate } from "react-router-dom";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-
 import AuthService from "../services/auth.service";
 
-// TODO remove, this demo shouldn't need to reset the theme.
+type Props = {
+  setAlert: (alert: { message: string; successful: boolean; open: boolean }) => void;
+};
+
+
 const defaultTheme = createTheme();
 
-
-
-export default function SignInSide() {
+const SignInSide: React.FC<Props> = ({ setAlert }) => {
 
   const [redirect, setRedirect] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     const currentUser = AuthService.getCurrentUser();
-
     if (currentUser) {
       setRedirect("/table");
     };
   }, []);
-
-  const validationSchema = () => {
-    return Yup.object().shape({
-      username: Yup.string().required("This field is required!"),
-      password: Yup.string().required("This field is required!"),
-    });
-  }
-
 
   if (redirect) {
     return <Navigate to={redirect} />
@@ -55,34 +43,33 @@ export default function SignInSide() {
 
     const data = new FormData(event.currentTarget);
 
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const username = data.get('username') as string;
+    const password = data.get('password') as string;
 
-    const username= data.get('email') as string;
-    const password=data.get('password') as string;
+    if (typeof (username) !== 'string' || username.length < 3) {
+      setAlert({message:'Username must be over 3 letters', successful:false, open:true});
+    } else if (typeof (password) !== 'string' || password.length < 8) {
+      setAlert({message:'Password should be over 8 letters', successful:false, open:true});
+    } else {
+      AuthService.login(username, password).then(
+        () => {
+          setAlert({message:"Login Successfully", successful:true, open:true});
+          setRedirect("/table");
+        },
+        error => {
+          const resMessage =
+            (error.response &&
+              error.response.data &&
+              error.response.data.message) ||
+            error.message ||
+            error.toString();
+            setAlert({message:resMessage, successful:false, open:true});
+          setLoading(false);
 
+        }
+      );
+    }
 
-    setMessage("");
-    setLoading(true);
-
-    AuthService.login(username, password).then(
-      () => {
-        setRedirect("/table");
-      },
-      error => {
-        const resMessage =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
-
-        setLoading(false);
-        setMessage(resMessage);
-      }
-    );
   };
 
   return (
@@ -117,17 +104,17 @@ export default function SignInSide() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              Yiggo Iot Sensor Management
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 required
                 fullWidth
-                id="email"
+                id="username"
                 label="User Name"
-                name="email"
-                autoComplete="email"
+                name="username"
+                autoComplete="username"
                 autoFocus
               />
               <TextField
@@ -159,3 +146,5 @@ export default function SignInSide() {
     </ThemeProvider>
   );
 }
+
+export default SignInSide;

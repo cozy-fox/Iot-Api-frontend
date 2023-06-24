@@ -1,15 +1,16 @@
 import axios from "axios";
 
-const API_URL = 'https://yggio3-beta.sensative.net/api';
+const API_URL = 'http://localhost:8080/api';
 
 class AuthService {
   login(username: string, password: string) {
     return axios
-      .post(API_URL + "/auth/local", {
-        username,
-        password
+      .post(API_URL + "/auth/signin", {
+        'username':username,
+        "password":password
       })
       .then(response => {
+
         if (response.data.token) {
           localStorage.setItem("user", JSON.stringify(response.data));
         }
@@ -22,10 +23,10 @@ class AuthService {
   }
 
   register(username: string, email: string, password: string) {
-    return axios.post(API_URL + "signup", {
-      username,
-      email,
-      password
+    return axios.post(API_URL + "/auth/signup", {
+      "username":username,
+      "email":email,
+      "password":password
     });
   }
 
