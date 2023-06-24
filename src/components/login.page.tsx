@@ -26,13 +26,6 @@ const SignInSide: React.FC<Props> = ({ setAlert }) => {
   const [redirect, setRedirect] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    const currentUser = AuthService.getCurrentUser();
-    if (currentUser) {
-      setRedirect("/table");
-    };
-  }, []);
-
   if (redirect) {
     return <Navigate to={redirect} />
   }
@@ -54,7 +47,7 @@ const SignInSide: React.FC<Props> = ({ setAlert }) => {
       AuthService.login(username, password).then(
         () => {
           setAlert({message:"Login Successfully", successful:true, open:true});
-          setRedirect("/table");
+          setRedirect("/devices");
         },
         error => {
           const resMessage =

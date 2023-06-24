@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 
 function LandingPage() {
+  console.log("1");
   const navigate = useNavigate();
   return (
     <div>

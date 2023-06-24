@@ -238,27 +238,27 @@ export default function EnhancedTable() {
     const [rows, setRows] = useState<Data[]>([{ deviceId: "", snr: 0, rssi: 0, name: "" }]);
     const [render, setRender]=useState<Number>(0);
 
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            userService.getAggioToken();
+        }, 1000);
 
+        return () => clearInterval(intervalId);
+    }, []);
 
     useEffect(() => {
         const intervalId = setInterval(() => {
             userService.getNodes().then((response) => {
-
                 const requestResult = response.data.map((each: any) => {
                     return createData(each._id, each.name, each.rssi, each.snr)
                 })
                 if (rows != requestResult) {
                     setRows(requestResult);
                     (render==0)?setRender(1):setRender(0);
-
                 }
-
-            }).catch((error) => {
-                console.log(error);
-            });
-
-        }, 500);
-
+            })
+            const response=userService.getNodes();
+        }, 1000);
         return () => clearInterval(intervalId);
     }, []);
 
