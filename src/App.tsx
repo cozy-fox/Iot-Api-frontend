@@ -46,13 +46,11 @@ const defaultTheme = createTheme();
 
 const App: React.FC<Props> = () => {
   const [alert, setAlert] = useState({ message: '', successful: true, open: false });
-
   const PrivateRoute = ({ children,adminPermission,title }: { children: React.ReactNode,adminPermission:boolean, title:string }) => {
     
     const user=authService.getCurrentUser();
     const navigate = useNavigate();
     var showAble=true;
-
     useEffect(() => {
       if (!user) {
         showAble=false;
@@ -103,7 +101,7 @@ const App: React.FC<Props> = () => {
   };
 
   return (
-    <div>rrr
+    <div>
       <div className="">
         <Routes>
           <Route path="/" element={<LandingPage />} />

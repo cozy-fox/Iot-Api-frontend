@@ -10,26 +10,26 @@ import MapIcon from '@mui/icons-material/Map';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { Link } from 'react-router-dom';
 import authService from "./../services/auth.service";
+import { useNavigate } from "react-router-dom";
 
-export const mainListItems = (
-  <React.Fragment>
-    <Link to="/devices">
-      <ListItemButton>
-        <ListItemIcon>
-          <DashboardIcon />
-        </ListItemIcon>
-        <ListItemText primary="Devices" />
-      </ListItemButton>
-    </Link>
+
+
+export const MainListItems = () => {
+  const navigate = useNavigate();
+  return (<React.Fragment>
+    <ListItemButton onClick={() => { navigate('/devices') }}>
+      <ListItemIcon>
+        <DashboardIcon />
+      </ListItemIcon>
+      <ListItemText primary="Devices" />
+    </ListItemButton>
     {authService.getCurrentUser().roles == 'admin' ?
-      <Link to="/users">
-        <ListItemButton>
-          <ListItemIcon>
-            <PeopleIcon />
-          </ListItemIcon>
-          <ListItemText primary="Users" />
-        </ListItemButton>
-      </Link>
+      <ListItemButton onClick={() => { navigate('/users') }}>
+        <ListItemIcon>
+          <PeopleIcon />
+        </ListItemIcon>
+        <ListItemText primary="Users" />
+      </ListItemButton>
       : <></>}
     <ListItemButton>
       <ListItemIcon>
@@ -43,8 +43,9 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Map" />
     </ListItemButton>
-  </React.Fragment>
-);
+  </React.Fragment>)
+
+};
 
 export const secondaryListItems = (
   <React.Fragment>

@@ -7,20 +7,8 @@ const Aggio_API_URL='https://yggio3-beta.sensative.net/api';
 var token:string;
 
 class UserService {
-  getPublicContent() {
-    return axios.get(API_URL + 'all');
-  }
-
-  getUserBoard() {
-    return axios.get(API_URL + 'user', { headers: authHeader() });
-  }
-
-  getModeratorBoard() {
-    return axios.get(API_URL + 'mod', { headers: authHeader() });
-  }
-
-  getAdminBoard() {
-    return axios.get(API_URL + 'admin', { headers: authHeader() });
+  getUsers() {
+    return axios.get(API_URL + '/users', { headers: authHeader() });
   }
   getNodes() {
     return axios.get(Aggio_API_URL+'/iotnodes', {headers: {Authorization:'Bearer ' + token}})

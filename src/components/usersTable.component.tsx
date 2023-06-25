@@ -23,25 +23,26 @@ import React, { useEffect, useState } from 'react';
 import userService from '../services/user.service';
 
 interface Data {
-    deviceId: string;
-    snr: number;
-    rssi: number;
+    id: string;
     name: string;
+    email: string;
+    role: string;
+    allowed: string;
 }
 
 function createData(
-
-    deviceId: string,
+    id: string,
     name: string,
-    rssi: number,
-    snr: number,
+    email: string,
+    role: string,
+    allowed: string
 ): Data {
     return {
-
-        deviceId,
+        id,
         name,
-        rssi,
-        snr
+        email,
+        role,
+        allowed
     };
 }
 
@@ -95,25 +96,25 @@ const headCells: readonly HeadCell[] = [
         id: 'name',
         numeric: false,
         disablePadding: true,
-        label: 'DeviceName',
+        label: 'Name',
     },
     {
-        id: 'deviceId',
+        id: 'email',
         numeric: true,
         disablePadding: false,
-        label: 'deviceId',
+        label: 'Email',
     },
     {
-        id: 'rssi',
+        id: 'role',
         numeric: true,
         disablePadding: false,
-        label: 'RSSI',
+        label: 'Role',
     },
     {
-        id: 'snr',
+        id: 'allowed',
         numeric: true,
         disablePadding: false,
-        label: 'SNR',
+        label: 'Allow State',
     }
 ];
 
@@ -235,24 +236,21 @@ export default function EnhancedTable() {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [rows, setRows] = useState<Data[]>([{ deviceId: "", snr: 0, rssi: 0, name: "" }]);
-    const [render, setRender]=useState<Number>(0);
+    const [rows, setRows] = useState<Data[]>([{ id:"",name: "", email: "", role: "user", allowed: "disabled" }]);
+    const [render, setRender] = useState<Number>(0);
 
 
-    // useEffect(() => {
-    //         userService.getNodes().then((response) => {
-    //             const requestResult = response.data.map((each: any) => {
-    //                 return createData(each._id, each.name, each.rssi, each.snr)
-    //             })
-    //             if (rows != requestResult) {
-    //                 setRows(requestResult);
-    //                 (render==0)?setRender(1):setRender(0);
-    //             }
-    //         })
-    //         const response=userService.getNodes();
-
-        
-    // }, []);
+    useEffect(() => {
+        userService.getUsers().then((response) => {
+            const requestResult = response.data.map((each: any) => {
+                return createData(each._id,each.username, each.email, each.role, each.allowed?'allowed':'disabled')
+            })
+            if (rows != requestResult) {
+                setRows(requestResult);
+                (render == 0) ? setRender(1) : setRender(0);
+            }
+        })
+    }, []);
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
@@ -300,7 +298,7 @@ export default function EnhancedTable() {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
-    
+
     const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
         setDense(event.target.checked);
     };
@@ -340,17 +338,17 @@ export default function EnhancedTable() {
                         />
                         <TableBody>
                             {visibleRows.map((row, index) => {
-                                const isItemSelected = isSelected(row.name);
+                                const isItemSelected = isSelected(row.id);
                                 const labelId = `enhanced-table-checkbox-${index}`;
 
                                 return (
                                     <TableRow
                                         hover
-                                        onClick={(event) => handleClick(event, row.name)}
+                                        onClick={(event) => handleClick(event, row.id)}
                                         role="checkbox"
                                         aria-checked={isItemSelected}
                                         tabIndex={-1}
-                                        key={row.name}
+                                        key={row.id}
                                         selected={isItemSelected}
                                         sx={{ cursor: 'pointer' }}
                                     >
@@ -371,9 +369,9 @@ export default function EnhancedTable() {
                                         >
                                             {row.name}
                                         </TableCell>
-                                        <TableCell align="right">{row.deviceId}</TableCell>
-                                        <TableCell align="right">{row.rssi}</TableCell>
-                                        <TableCell align="right">{row.snr}</TableCell>
+                                        <TableCell align="right">{row.email}</TableCell>
+                                        <TableCell align="right">{row.role}</TableCell>
+                                        <TableCell align="right">{row.allowed}</TableCell>
                                     </TableRow>
                                 );
                             })}
