@@ -23,7 +23,7 @@ export const MainListItems = () => {
       </ListItemIcon>
       <ListItemText primary="Devices" />
     </ListItemButton>
-    {authService.getCurrentUser().roles == 'admin' ?
+    {authService.getCurrentUser().roles === 'admin' ?
       <ListItemButton onClick={() => { navigate('/users') }}>
         <ListItemIcon>
           <PeopleIcon />

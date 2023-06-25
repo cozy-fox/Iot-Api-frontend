@@ -252,7 +252,7 @@ export default function EnhancedTable() {
                 const requestResult = response.data.map((each: any) => {
                     return createData(each._id, each.name, each.rssi, each.snr)
                 })
-                if (rows != requestResult) {
+                if (rows !== requestResult) {
                     setRows(requestResult);
                     (render==0)?setRender(1):setRender(0);
                 }

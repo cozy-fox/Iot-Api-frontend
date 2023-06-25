@@ -17,239 +17,280 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import Stack from '@mui/material/Stack';
 import { visuallyHidden } from '@mui/utils';
 import React, { useEffect, useState } from 'react';
 import userService from '../services/user.service';
+import Button from '@mui/material/Button';
+import Alert from "./alert.component";
 
-interface Data {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    allowed: string;
-}
 
-function createData(
-    id: string,
-    name: string,
-    email: string,
-    role: string,
-    allowed: string
-): Data {
-    return {
-        id,
-        name,
-        email,
-        role,
-        allowed
+type Props = {};
+
+const EnhancedTable: React.FC<Props> = () => {
+    const [alert, setAlert] = useState({ message: '', successful: true, open: false });
+
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+      setAlert({...alert, open: false } );
     };
-}
-
-
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
+    interface Data {
+        id: string;
+        name: string;
+        email: string;
+        role: string;
+        allowed: string;
     }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
 
-type Order = 'asc' | 'desc';
-
-function getComparator<Key extends keyof any>(
-    order: Order,
-    orderBy: Key,
-): (
-    a: { [key in Key]: number | string },
-    b: { [key in Key]: number | string },
-) => number {
-    return order === 'desc'
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-
-function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
-    const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) {
-            return order;
-        }
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
-}
-
-interface HeadCell {
-    disablePadding: boolean;
-    id: keyof Data;
-    label: string;
-    numeric: boolean;
-}
-
-const headCells: readonly HeadCell[] = [
-    {
-        id: 'name',
-        numeric: false,
-        disablePadding: true,
-        label: 'Name',
-    },
-    {
-        id: 'email',
-        numeric: true,
-        disablePadding: false,
-        label: 'Email',
-    },
-    {
-        id: 'role',
-        numeric: true,
-        disablePadding: false,
-        label: 'Role',
-    },
-    {
-        id: 'allowed',
-        numeric: true,
-        disablePadding: false,
-        label: 'Allow State',
-    }
-];
-
-interface EnhancedTableProps {
-    numSelected: number;
-    onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-    onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    order: Order;
-    orderBy: string;
-    rowCount: number;
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-        props;
-    const createSortHandler =
-        (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
-            onRequestSort(event, property);
+    function createData(
+        id: string,
+        name: string,
+        email: string,
+        role: string,
+        allowed: string
+    ): Data {
+        return {
+            id,
+            name,
+            email,
+            role,
+            allowed
         };
+    }
 
-    return (
-        <TableHead>
-            <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={numSelected > 0 && numSelected < rowCount}
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            'aria-label': 'select all desserts',
-                        }}
-                    />
-                </TableCell>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'left'}
-                        padding={headCell.disablePadding ? 'none' : 'normal'}
-                        sortDirection={orderBy === headCell.id ? order : false}
-                    >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : 'asc'}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
+
+    function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+        if (b[orderBy] < a[orderBy]) {
+            return -1;
+        }
+        if (b[orderBy] > a[orderBy]) {
+            return 1;
+        }
+        return 0;
+    }
+
+    type Order = 'asc' | 'desc';
+
+    function getComparator<Key extends keyof any>(
+        order: Order,
+        orderBy: Key,
+    ): (
+        a: { [key in Key]: number | string },
+        b: { [key in Key]: number | string },
+    ) => number {
+        return order === 'desc'
+            ? (a, b) => descendingComparator(a, b, orderBy)
+            : (a, b) => -descendingComparator(a, b, orderBy);
+    }
+
+
+    function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
+        const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+        stabilizedThis.sort((a, b) => {
+            const order = comparator(a[0], b[0]);
+            if (order !== 0) {
+                return order;
+            }
+            return a[1] - b[1];
+        });
+        return stabilizedThis.map((el) => el[0]);
+    }
+
+    interface HeadCell {
+        disablePadding: boolean;
+        id: keyof Data;
+        label: string;
+        numeric: boolean;
+    }
+
+    const headCells: readonly HeadCell[] = [
+        {
+            id: 'name',
+            numeric: false,
+            disablePadding: true,
+            label: 'Name',
+        },
+        {
+            id: 'email',
+            numeric: true,
+            disablePadding: false,
+            label: 'Email',
+        },
+        {
+            id: 'role',
+            numeric: true,
+            disablePadding: false,
+            label: 'Role',
+        },
+        {
+            id: 'allowed',
+            numeric: true,
+            disablePadding: false,
+            label: 'Allow State',
+        }
+    ];
+
+    interface EnhancedTableProps {
+        numSelected: number;
+        onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
+        onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+        order: Order;
+        orderBy: string;
+        rowCount: number;
+    }
+
+    function EnhancedTableHead(props: EnhancedTableProps) {
+        const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+            props;
+        const createSortHandler =
+            (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+                onRequestSort(event, property);
+            };
+
+        return (
+            <TableHead>
+                <TableRow>
+                    <TableCell padding="checkbox">
+                        <Checkbox
+                            color="primary"
+                            indeterminate={numSelected > 0 && numSelected < rowCount}
+                            checked={rowCount > 0 && numSelected === rowCount}
+                            onChange={onSelectAllClick}
+                            inputProps={{
+                                'aria-label': 'select all desserts',
+                            }}
+                        />
                     </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
-    );
-}
+                    {headCells.map((headCell) => (
+                        <TableCell
+                            key={headCell.id}
+                            align={headCell.numeric ? 'right' : 'left'}
+                            padding={headCell.disablePadding ? 'none' : 'normal'}
+                            sortDirection={orderBy === headCell.id ? order : false}
+                        >
+                            <TableSortLabel
+                                active={orderBy === headCell.id}
+                                direction={orderBy === headCell.id ? order : 'asc'}
+                                onClick={createSortHandler(headCell.id)}
+                            >
+                                {headCell.label}
+                                {orderBy === headCell.id ? (
+                                    <Box component="span" sx={visuallyHidden}>
+                                        {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                    </Box>
+                                ) : null}
+                            </TableSortLabel>
+                        </TableCell>
+                    ))}
+                </TableRow>
+            </TableHead>
+        );
+    }
 
-interface EnhancedTableToolbarProps {
-    numSelected: number;
-}
+    interface EnhancedTableToolbarProps {
+        numSelected: ReadonlyArray<string>;
+    }
 
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-    const { numSelected } = props;
 
-    return (
-        <Toolbar
-            sx={{
-                pl: { sm: 2 },
-                pr: { xs: 1, sm: 1 },
-                ...(numSelected > 0 && {
-                    bgcolor: (theme) =>
-                        alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                }),
-            }}
-        >
-            {numSelected > 0 ? (
-                <Typography
-                    sx={{ flex: '1 1 100%' }}
-                    color="inherit"
-                    variant="subtitle1"
-                    component="div"
-                >
-                    {numSelected} selected
-                </Typography>
-            ) : (
-                <Typography
-                    sx={{ flex: '1 1 100%' }}
-                    variant="h6"
-                    id="tableTitle"
-                    component="div"
-                >
-                    IOT Devices
-                </Typography>
-            )}
-            {numSelected > 0 ? (
+
+    function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
+        const { numSelected } = props;
+
+        const deleteUsers = () => {
+            userService.deleteUsers(numSelected).then(response => {
+                setAlert({ message: response.data.message, successful: true, open: true });
+                getUsers();
+            }).catch(error => {
+                const resMessage =(error.response &&error.response.data &&
+                        error.response.data.message) ||error.message ||error.toString();
+                setAlert({ message: resMessage, successful: false, open: true });
+            });
+        }
+
+        const updateUsers = ( field:string, value:string ) => {
+            userService.updateUsers({ selectedUsers: numSelected, field: field, value: value }).then(response => {
+                setAlert({ message: response.data.message, successful: true, open: true });
+                getUsers();
+            }).catch(error => {
+                const resMessage =(error.response &&error.response.data &&
+                        error.response.data.message) ||error.message ||error.toString();
+                setAlert({ message: resMessage, successful: false, open: true });
+            });
+        }
+
+        return (
+            <Toolbar
+                sx={{
+                    pl: { sm: 2 },
+                    pr: { xs: 1, sm: 1 },
+                    ...(numSelected.length > 0 && {
+                        bgcolor: (theme) =>
+                            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                    }),
+                }}
+            >
+                {numSelected.length > 0 ? (
+                    <Typography
+                        sx={{ flex: '1 1 100%' }}
+                        color="inherit"
+                        variant="subtitle1"
+                        component="div"
+                    >
+                        {numSelected.length} selected
+                    </Typography>
+                ) : (
+                    <Typography
+                        sx={{ flex: '1 1 100%' }}
+                        variant="h6"
+                        id="tableTitle"
+                        component="div"
+                    >
+                        User Management
+                    </Typography>
+                )}
+
+                <Stack direction="row" spacing={2}>
+                    <Button variant="contained" disabled={numSelected.length === 0} onClick={()=>updateUsers("role","user")}>User</Button>
+                    <Button variant="contained" disabled={numSelected.length === 0} onClick={()=>updateUsers("role","admin")}>Admin</Button>
+                    <Button variant="contained" disabled={numSelected.length === 0} color="success"  onClick={()=>updateUsers("allowed","true")}>
+                        Allow
+                    </Button>
+                    <Button variant="contained" color="error" disabled={numSelected.length === 0}  onClick={()=>updateUsers("allowed","false")}>
+                        Block
+                    </Button>
+                </Stack>
+
                 <Tooltip title="Delete">
-                    <IconButton>
+                    <IconButton disabled={numSelected.length === 0} onClick={deleteUsers}>
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>
-            ) : (
-                <Tooltip title="Filter list">
-                    <IconButton>
-                        <FilterListIcon />
-                    </IconButton>
-                </Tooltip>
-            )}
-        </Toolbar>
-    );
-}
 
-export default function EnhancedTable() {
+            </Toolbar>
+        );
+    }
+
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState<keyof Data>('name');
     const [selected, setSelected] = React.useState<readonly string[]>([]);
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [rows, setRows] = useState<Data[]>([{ id:"",name: "", email: "", role: "user", allowed: "disabled" }]);
+    const [rowsPerPage, setRowsPerPage] = React.useState(20);
+    const [rows, setRows] = useState<Data[]>([{ id: "", name: "", email: "", role: "user", allowed: "disabled" }]);
     const [render, setRender] = useState<Number>(0);
-
-
-    useEffect(() => {
-        userService.getUsers().then((response) => {
-            const requestResult = response.data.map((each: any) => {
-                return createData(each._id,each.username, each.email, each.role, each.allowed?'allowed':'disabled')
-            })
-            if (rows != requestResult) {
-                setRows(requestResult);
-                (render == 0) ? setRender(1) : setRender(0);
-            }
+    console.log("table");
+const getUsers=()=>{
+    userService.getUsers().then((response) => {
+        const requestResult = response.data.map((each: any) => {
+            return createData(each._id, each.username, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
         })
+        if (rows !== requestResult) {
+            setRows(requestResult);
+            (render === 0) ? setRender(1) : setRender(0);
+        }
+    })
+}
+    useEffect(() => {
+        getUsers();
     }, []);
 
     const handleRequestSort = (
@@ -263,7 +304,7 @@ export default function EnhancedTable() {
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = rows.map((n) => n.name);
+            const newSelected = rows.map((n) => n.id);
             setSelected(newSelected);
             return;
         }
@@ -321,7 +362,8 @@ export default function EnhancedTable() {
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
+            <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose}/>
+                <EnhancedTableToolbar numSelected={selected} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -388,7 +430,7 @@ export default function EnhancedTable() {
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[10, 20, 50]}
                     component="div"
                     count={rows.length}
                     rowsPerPage={rowsPerPage}
@@ -404,3 +446,5 @@ export default function EnhancedTable() {
         </Box>
     );
 }
+
+export default EnhancedTable;

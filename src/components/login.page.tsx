@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Navigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
+import Alert from "./alert.component";
 
 type Props = {
   setAlert: (alert: { message: string; successful: boolean; open: boolean }) => void;
@@ -21,7 +22,14 @@ type Props = {
 
 const defaultTheme = createTheme();
 
-const SignInSide: React.FC<Props> = ({ setAlert }) => {
+const SignInSide =() => {
+  const [alert, setAlert] = useState({ message: '', successful: true, open: false });
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    setAlert({...alert, open: false } );
+  };
+
+
 
   const [redirect, setRedirect] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,8 +38,8 @@ const SignInSide: React.FC<Props> = ({ setAlert }) => {
     return <Navigate to={redirect} />
   }
 
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+   
     event.preventDefault();
 
     const data = new FormData(event.currentTarget);
@@ -40,6 +48,7 @@ const SignInSide: React.FC<Props> = ({ setAlert }) => {
     const password = data.get('password') as string;
 
     if (typeof (username) !== 'string' || username.length < 3) {
+      
       setAlert({message:'Username must be over 3 letters', successful:false, open:true});
     } else if (typeof (password) !== 'string' || password.length < 8) {
       setAlert({message:'Password should be over 8 letters', successful:false, open:true});
@@ -67,6 +76,7 @@ const SignInSide: React.FC<Props> = ({ setAlert }) => {
 
   return (
     <ThemeProvider theme={defaultTheme}>
+      <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose}/>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid

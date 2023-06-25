@@ -14,10 +14,9 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import AuthService from "../services/auth.service";
 import { useNavigate } from "react-router-dom";
+import Alert from "./alert.component";
 
-type Props = {
-    setAlert: (alert: { message: string; successful: boolean; open: boolean }) => void;
-};
+type Props = {};
 
 
 function Copyright(props: any) {
@@ -36,9 +35,13 @@ function Copyright(props: any) {
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-const SignUp: React.FC<Props> = ({ setAlert }) => {
+const SignUp: React.FC<Props> = () => {
     const navigate = useNavigate();
+    const [alert, setAlert] = useState({ message: '', successful: true, open: false });
 
+    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+      setAlert({...alert, open: false } );
+    };
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -48,7 +51,7 @@ const SignUp: React.FC<Props> = ({ setAlert }) => {
 
         if (typeof (username) !== 'string' || username.length < 3) {
             setAlert({ message: 'Username must be over 3 letters', successful: false, open: true });
-        } else if (typeof (email) !== 'string' || email.length == 0) {
+        } else if (typeof (email) !== 'string' || email.length === 0) {
             setAlert({ message: 'Invalid Email', successful: false, open: true });
         } else if (typeof (password) !== 'string' || password.length < 8) {
             setAlert({ message: 'Password should be over 8 letters', successful: false, open: true });
@@ -74,6 +77,7 @@ const SignUp: React.FC<Props> = ({ setAlert }) => {
     return (
         <ThemeProvider theme={defaultTheme}>
             <Container component="main" maxWidth="xs">
+            <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose}/>
                 <CssBaseline />
                 <Box
                     sx={{
