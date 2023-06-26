@@ -21,27 +21,26 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import React, { useEffect, useState } from 'react';
 import userService from '../services/user.service';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import MapComponent from './map.component';
 
 interface Data {
     deviceId: string;
-    snr: number;
-    rssi: number;
     name: string;
+    status: string;
 }
 
 function createData(
-
     deviceId: string,
     name: string,
-    rssi: number,
-    snr: number,
+    status: string
 ): Data {
     return {
 
         deviceId,
         name,
-        rssi,
-        snr
+        status
     };
 }
 
@@ -98,22 +97,10 @@ const headCells: readonly HeadCell[] = [
         label: 'DeviceName',
     },
     {
-        id: 'deviceId',
+        id: 'status',
         numeric: true,
         disablePadding: false,
-        label: 'deviceId',
-    },
-    {
-        id: 'rssi',
-        numeric: true,
-        disablePadding: false,
-        label: 'RSSI',
-    },
-    {
-        id: 'snr',
-        numeric: true,
-        disablePadding: false,
-        label: 'SNR',
+        label: 'Status',
     }
 ];
 
@@ -235,31 +222,34 @@ export default function EnhancedTable() {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [rows, setRows] = useState<Data[]>([{ deviceId: "", snr: 0, rssi: 0, name: "" }]);
-    const [render, setRender]=useState<Number>(0);
+    const [rows, setRows] = useState<Data[]>([]);
+    const [devices, setDevices] = useState<any>({});
+    const [render, setRender] = useState<Number>(0);
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            userService.getAggioToken();
-        }, 1000);
-
-        return () => clearInterval(intervalId);
-    }, []);
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            userService.getNodes().then((response) => {
+        const sendRequest = (): void => {
+            userService.getAggioToken().then((response) => {
+                var devicesList: {[key: string]: any} = {};
                 const requestResult = response.data.map((each: any) => {
-                    return createData(each._id, each.name, each.rssi, each.snr)
-                })
+                    devicesList[each._id]= each;
+                    return createData(each._id, each.name, "available")
+                });
+                setDevices(devicesList);
+console.log(devicesList,devices);
                 if (rows !== requestResult) {
+                    
                     setRows(requestResult);
-                    (render==0)?setRender(1):setRender(0);
+                    (render == 0) ? setRender(1) : setRender(0);
                 }
-            })
-            const response=userService.getNodes();
-        }, 1000);
-        return () => clearInterval(intervalId);
+            });
+            setTimeout(sendRequest, 5000);
+        };
+
+        const timeoutId = setTimeout(sendRequest, 0);
+
+        return (): void => {
+            clearTimeout(timeoutId);
+        };
     }, []);
 
     const handleRequestSort = (
@@ -273,7 +263,7 @@ export default function EnhancedTable() {
 
     const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-            const newSelected = rows.map((n) => n.name);
+            const newSelected = rows.map((n) => n.deviceId);
             setSelected(newSelected);
             return;
         }
@@ -300,6 +290,7 @@ export default function EnhancedTable() {
         setSelected(newSelected);
     };
 
+
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
@@ -308,7 +299,7 @@ export default function EnhancedTable() {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
-    
+
     const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
         setDense(event.target.checked);
     };
@@ -329,88 +320,109 @@ export default function EnhancedTable() {
     );
 
     return (
-        <Box sx={{ width: '100%' }}>
-            <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
-                <TableContainer>
-                    <Table
-                        sx={{ minWidth: 750 }}
-                        aria-labelledby="tableTitle"
-                        size={dense ? 'small' : 'medium'}
-                    >
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
-                        />
-                        <TableBody>
-                            {visibleRows.map((row, index) => {
-                                const isItemSelected = isSelected(row.name);
-                                const labelId = `enhanced-table-checkbox-${index}`;
-
-                                return (
-                                    <TableRow
-                                        hover
-                                        onClick={(event) => handleClick(event, row.name)}
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={row.name}
-                                        selected={isItemSelected}
-                                        sx={{ cursor: 'pointer' }}
+        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+                <Grid item sm={12} md={6}>
+                    <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                        <Box sx={{ width: '100%' }}>
+                            <Paper sx={{ width: '100%', mb: 2 }}>
+                                <EnhancedTableToolbar numSelected={selected.length} />
+                                <TableContainer>
+                                    <Table
+                                        sx={{ minWidth: 250 }}
+                                        aria-labelledby="tableTitle"
+                                        size={dense ? 'small' : 'medium'}
                                     >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId,
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                        >
-                                            {row.name}
-                                        </TableCell>
-                                        <TableCell align="right">{row.deviceId}</TableCell>
-                                        <TableCell align="right">{row.rssi}</TableCell>
-                                        <TableCell align="right">{row.snr}</TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                            {emptyRows > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: (dense ? 33 : 53) * emptyRows,
-                                    }}
-                                >
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
-                    component="div"
-                    count={rows.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
-            <FormControlLabel
-                control={<Switch checked={dense} onChange={handleChangeDense} />}
-                label="Dense padding"
-            />
-        </Box>
+                                        <EnhancedTableHead
+                                            numSelected={selected.length}
+                                            order={order}
+                                            orderBy={orderBy}
+                                            onSelectAllClick={handleSelectAllClick}
+                                            onRequestSort={handleRequestSort}
+                                            rowCount={rows.length}
+                                        />
+                                        <TableBody>
+                                            {visibleRows.map((row, index) => {
+                                                const isItemSelected = isSelected(row.deviceId);
+                                                const labelId = `enhanced-table-checkbox-${index}`;
+
+                                                return (
+                                                    <TableRow
+                                                        hover
+                                                        onClick={(event) => handleClick(event, row.deviceId)}
+                                                        role="checkbox"
+                                                        aria-checked={isItemSelected}
+                                                        tabIndex={-1}
+                                                        key={row.name}
+                                                        selected={isItemSelected}
+                                                        sx={{ cursor: 'pointer' }}
+                                                    >
+                                                        <TableCell padding="checkbox">
+                                                            <Checkbox
+                                                                color="primary"
+                                                                checked={isItemSelected}
+                                                                inputProps={{
+                                                                    'aria-labelledby': labelId,
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell
+                                                            component="th"
+                                                            id={labelId}
+                                                            scope="row"
+                                                            padding="none"
+                                                        >
+                                                            {row.name}
+                                                        </TableCell>
+                                                        <TableCell align="right">{row.status}</TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
+                                            {emptyRows > 0 && (
+                                                <TableRow
+                                                    style={{
+                                                        height: (dense ? 33 : 53) * emptyRows,
+                                                    }}
+                                                >
+                                                    <TableCell colSpan={6} />
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 25]}
+                                    component="div"
+                                    count={rows.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+                            </Paper>
+                            <FormControlLabel
+                                control={<Switch checked={dense} onChange={handleChangeDense} />}
+                                label="Dense padding"
+                            />
+                        </Box>
+                    </Paper>
+                </Grid>
+                <Grid item sm={12} md={6}>
+                    <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column',minHeight:"400px" }}>
+                 <h3>{selected.length>0?selected.length>1?selected.length+' Devices Selected':devices[selected[0]].name:'None Selected'}</h3>
+                                {selected.length > 0 ? <MapComponent
+                                    locations={selected.map(each => {
+                                        return {
+                                            latitude: devices[each].latlng[0],
+                                            longitude: devices[each].latlng[1]
+                                        }
+                                    })}
+                                /> : ''}
+
+                      
+                    </Paper>
+                </Grid>
+            </Grid>
+        </Container>
     );
 }

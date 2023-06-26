@@ -7,31 +7,13 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import Header from './components/header.component';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Devices from './components/deviceTable.component';
+import Devices from './components/deviceTable.page';
 import authService from "./services/auth.service";
-import Users from "./components/usersTable.component";
+import Users from "./components/usersTable.page";
 import Alert from "./components/alert.component";
 
-
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 type Props = {};
 
@@ -72,16 +54,7 @@ const App: React.FC<Props> = () => {
             }}
           >
             <Toolbar />
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                    {children}
-                  </Paper>
-                </Grid>
-              </Grid>
-              <Copyright sx={{ pt: 4 }} />
-            </Container>
+            {children}
           </Box>
         </Box>
       </ThemeProvider>

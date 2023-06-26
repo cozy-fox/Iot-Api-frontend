@@ -10,15 +10,14 @@ class UserService {
   getUsers() {
     return axios.get(API_URL + '/users', { headers: authHeader() });
   }
-  getNodes() {
-    return axios.get(Aggio_API_URL + '/iotnodes', { headers: { Authorization: 'Bearer ' + token } })
-  }
-  getAggioToken() {
-    axios.get(API_URL + '/devices', { headers: authHeader() }).then(
+  async getAggioToken() {
+    await axios.get(API_URL + '/devices', { headers: authHeader() }).then(
       response => {
         token = response.data;
       }
     );
+
+    return axios.get(Aggio_API_URL + '/iotnodes', { headers: { Authorization: 'Bearer ' + token } });
   }
   deleteUsers(selectedUsers: ReadonlyArray<string>) {
     return axios.delete(API_URL + '/users', { data: { selectedUsers: selectedUsers },headers: authHeader() });

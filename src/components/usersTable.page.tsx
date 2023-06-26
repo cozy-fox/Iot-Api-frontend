@@ -10,7 +10,6 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -23,15 +22,19 @@ import React, { useEffect, useState } from 'react';
 import userService from '../services/user.service';
 import Button from '@mui/material/Button';
 import Alert from "./alert.component";
-
-
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 type Props = {};
 
 const EnhancedTable: React.FC<Props> = () => {
     const [alert, setAlert] = useState({ message: '', successful: true, open: false });
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-      setAlert({...alert, open: false } );
+        setAlert({ ...alert, open: false });
     };
     interface Data {
         id: string;
@@ -195,24 +198,15 @@ const EnhancedTable: React.FC<Props> = () => {
     function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         const { numSelected } = props;
 
-        const deleteUsers = () => {
-            userService.deleteUsers(numSelected).then(response => {
-                setAlert({ message: response.data.message, successful: true, open: true });
-                getUsers();
-            }).catch(error => {
-                const resMessage =(error.response &&error.response.data &&
-                        error.response.data.message) ||error.message ||error.toString();
-                setAlert({ message: resMessage, successful: false, open: true });
-            });
-        }
 
-        const updateUsers = ( field:string, value:string ) => {
+
+        const updateUsers = (field: string, value: string) => {
             userService.updateUsers({ selectedUsers: numSelected, field: field, value: value }).then(response => {
                 setAlert({ message: response.data.message, successful: true, open: true });
                 getUsers();
             }).catch(error => {
-                const resMessage =(error.response &&error.response.data &&
-                        error.response.data.message) ||error.message ||error.toString();
+                const resMessage = (error.response && error.response.data &&
+                    error.response.data.message) || error.message || error.toString();
                 setAlert({ message: resMessage, successful: false, open: true });
             });
         }
@@ -249,18 +243,18 @@ const EnhancedTable: React.FC<Props> = () => {
                 )}
 
                 <Stack direction="row" spacing={2}>
-                    <Button variant="contained" disabled={numSelected.length === 0} onClick={()=>updateUsers("role","user")}>User</Button>
-                    <Button variant="contained" disabled={numSelected.length === 0} onClick={()=>updateUsers("role","admin")}>Admin</Button>
-                    <Button variant="contained" disabled={numSelected.length === 0} color="success"  onClick={()=>updateUsers("allowed","true")}>
+                    <Button variant="contained" disabled={numSelected.length === 0} onClick={() => updateUsers("role", "user")}>User</Button>
+                    <Button variant="contained" disabled={numSelected.length === 0} onClick={() => updateUsers("role", "admin")}>Admin</Button>
+                    <Button variant="contained" disabled={numSelected.length === 0} color="success" onClick={() => updateUsers("allowed", "true")}>
                         Allow
                     </Button>
-                    <Button variant="contained" color="error" disabled={numSelected.length === 0}  onClick={()=>updateUsers("allowed","false")}>
+                    <Button variant="contained" color="error" disabled={numSelected.length === 0} onClick={() => updateUsers("allowed", "false")}>
                         Block
                     </Button>
                 </Stack>
 
                 <Tooltip title="Delete">
-                    <IconButton disabled={numSelected.length === 0} onClick={deleteUsers}>
+                    <IconButton disabled={numSelected.length === 0} onClick={dialogOpen}>
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>
@@ -277,18 +271,41 @@ const EnhancedTable: React.FC<Props> = () => {
     const [rowsPerPage, setRowsPerPage] = React.useState(20);
     const [rows, setRows] = useState<Data[]>([{ id: "", name: "", email: "", role: "user", allowed: "disabled" }]);
     const [render, setRender] = useState<Number>(0);
-    console.log("table");
-const getUsers=()=>{
-    userService.getUsers().then((response) => {
-        const requestResult = response.data.map((each: any) => {
-            return createData(each._id, each.username, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
+    const [open, setOpen] = React.useState(false);
+
+    const dialogOpen = () => {
+        setOpen(true);
+    };
+
+    const dialogClose = () => {
+        setOpen(false);
+    };
+
+    const deleteUsers = () => {
+        userService.deleteUsers(selected).then(response => {
+            setAlert({ message: response.data.message, successful: true, open: true });
+            dialogClose();
+            setSelected([]);
+            getUsers();
+
+        }).catch(error => {
+            const resMessage = (error.response && error.response.data &&
+                error.response.data.message) || error.message || error.toString();
+            setAlert({ message: resMessage, successful: false, open: true });
+        });
+    }
+
+    const getUsers = () => {
+        userService.getUsers().then((response) => {
+            const requestResult = response.data.map((each: any) => {
+                return createData(each._id, each.username, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
+            })
+            if (rows !== requestResult) {
+                setRows(requestResult);
+                (render === 0) ? setRender(1) : setRender(0);
+            }
         })
-        if (rows !== requestResult) {
-            setRows(requestResult);
-            (render === 0) ? setRender(1) : setRender(0);
-        }
-    })
-}
+    }
     useEffect(() => {
         getUsers();
     }, []);
@@ -360,91 +377,118 @@ const getUsers=()=>{
     );
 
     return (
-        <Box sx={{ width: '100%' }}>
-            <Paper sx={{ width: '100%', mb: 2 }}>
-            <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose}/>
-                <EnhancedTableToolbar numSelected={selected} />
-                <TableContainer>
-                    <Table
-                        sx={{ minWidth: 750 }}
-                        aria-labelledby="tableTitle"
-                        size={dense ? 'small' : 'medium'}
-                    >
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
-                        />
-                        <TableBody>
-                            {visibleRows.map((row, index) => {
-                                const isItemSelected = isSelected(row.id);
-                                const labelId = `enhanced-table-checkbox-${index}`;
-
-                                return (
-                                    <TableRow
-                                        hover
-                                        onClick={(event) => handleClick(event, row.id)}
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={row.id}
-                                        selected={isItemSelected}
-                                        sx={{ cursor: 'pointer' }}
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+                <Grid item xs={12}>
+                    <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                        <Box sx={{ width: '100%' }}>
+                            <Paper sx={{ width: '100%', mb: 2 }}>
+                                <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose} />
+                                <EnhancedTableToolbar numSelected={selected} />
+                                <TableContainer>
+                                    <Table
+                                        sx={{ minWidth: 750 }}
+                                        aria-labelledby="tableTitle"
+                                        size={dense ? 'small' : 'medium'}
                                     >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId,
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                        >
-                                            {row.name}
-                                        </TableCell>
-                                        <TableCell align="right">{row.email}</TableCell>
-                                        <TableCell align="right">{row.role}</TableCell>
-                                        <TableCell align="right">{row.allowed}</TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                            {emptyRows > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: (dense ? 33 : 53) * emptyRows,
-                                    }}
-                                >
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[10, 20, 50]}
-                    component="div"
-                    count={rows.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
-            <FormControlLabel
-                control={<Switch checked={dense} onChange={handleChangeDense} />}
-                label="Dense padding"
-            />
-        </Box>
+                                        <EnhancedTableHead
+                                            numSelected={selected.length}
+                                            order={order}
+                                            orderBy={orderBy}
+                                            onSelectAllClick={handleSelectAllClick}
+                                            onRequestSort={handleRequestSort}
+                                            rowCount={rows.length}
+                                        />
+
+                                        <TableBody>
+                                            {visibleRows.map((row, index) => {
+                                                const isItemSelected = isSelected(row.id);
+                                                const labelId = `enhanced-table-checkbox-${index}`;
+
+                                                return (
+                                                    <TableRow
+                                                        hover
+                                                        onClick={(event) => handleClick(event, row.id)}
+                                                        role="checkbox"
+                                                        aria-checked={isItemSelected}
+                                                        tabIndex={-1}
+                                                        key={row.id}
+                                                        selected={isItemSelected}
+                                                        sx={{ cursor: 'pointer' }}
+                                                    >
+                                                        <TableCell padding="checkbox">
+                                                            <Checkbox
+                                                                color="primary"
+                                                                checked={isItemSelected}
+                                                                inputProps={{
+                                                                    'aria-labelledby': labelId,
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell
+                                                            component="th"
+                                                            id={labelId}
+                                                            scope="row"
+                                                            padding="none"
+                                                        >
+                                                            {row.name}
+                                                        </TableCell>
+                                                        <TableCell align="right">{row.email}</TableCell>
+                                                        <TableCell align="right">{row.role}</TableCell>
+                                                        <TableCell align="right">{row.allowed}</TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
+                                            {emptyRows > 0 && (
+                                                <TableRow
+                                                    style={{
+                                                        height: (dense ? 33 : 53) * emptyRows,
+                                                    }}
+                                                >
+                                                    <TableCell colSpan={6} />
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <TablePagination
+                                    rowsPerPageOptions={[10, 20, 50]}
+                                    component="div"
+                                    count={rows.length}
+                                    rowsPerPage={rowsPerPage}
+                                    page={page}
+                                    onPageChange={handleChangePage}
+                                    onRowsPerPageChange={handleChangeRowsPerPage}
+                                />
+                            </Paper>
+                            <Dialog
+                                open={open}
+                                onClose={dialogClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description"
+                            >
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Do you really want to delete those users?"}
+                                </DialogTitle>
+                                <DialogActions>
+                                    <Button onClick={deleteUsers}>Yes</Button>
+                                    <Button onClick={dialogClose} autoFocus>
+                                        No
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                            <FormControlLabel
+                                control={<Switch checked={dense} onChange={handleChangeDense} />}
+                                label="Dense padding"
+                            />
+                        </Box>
+                    </Paper>
+                </Grid>
+            </Grid>
+        </Container>
     );
 }
+
+
 
 export default EnhancedTable;
