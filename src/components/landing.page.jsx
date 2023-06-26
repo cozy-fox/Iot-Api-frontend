@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 
 function LandingPage() {
-  console.log("1");
   const navigate = useNavigate();
   return (
     <div>
@@ -18,7 +17,7 @@ function LandingPage() {
                     <div className="ssr-variant">
                       <div className="framer-1imnr1g" style={{ outline: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', flexShrink: 0, transform: 'none' }} data-framer-component-type="RichTextContainer" viewbox="0 0 115 32">
                         <div width="100%" height="100%" transform="scale(1)" style={{ overflow: 'visible', transformOrigin: 'center center' }}>
-                          <h1 style={{ fontSelector: 'R0Y7Qm93bGJ5IE9uZS1yZWd1bGFy', fontFamily: '"Bowlby One", sans-serif', fontSize: '142px', lineHeight: '1em', textAlign: 'left', color: 'rgb(255, 255, 255)', TextTransform: 'uppercase' }} className="framer-text">Yiggo</h1>
+                          <h1 style={{ fontSelector: 'R0Y7Qm93bGJ5IE9uZS1yZWd1bGFy', fontFamily: '"Bowlby One", sans-serif', fontSize: '142px', lineHeight: '1em', textAlign: 'left', color: 'rgb(255, 255, 255)', TextTransform: 'uppercase' }} className="framer-text">Yggio</h1>
                         </div>
                       </div>
                     </div>

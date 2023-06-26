@@ -9,21 +9,22 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import React, { useEffect, useState } from 'react';
 import userService from '../services/user.service';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import MapComponent from './map.component';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
 
 interface Data {
     deviceId: string;
@@ -198,19 +199,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                     IOT Devices
                 </Typography>
             )}
-            {numSelected > 0 ? (
-                <Tooltip title="Delete">
-                    <IconButton>
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip>
-            ) : (
-                <Tooltip title="Filter list">
-                    <IconButton>
-                        <FilterListIcon />
-                    </IconButton>
-                </Tooltip>
-            )}
         </Toolbar>
     );
 }
@@ -225,19 +213,19 @@ export default function EnhancedTable() {
     const [rows, setRows] = useState<Data[]>([]);
     const [devices, setDevices] = useState<any>({});
     const [render, setRender] = useState<Number>(0);
+    const [expanded, setExpanded] = useState<Array<string>>([]);
 
     useEffect(() => {
         const sendRequest = (): void => {
             userService.getAggioToken().then((response) => {
-                var devicesList: {[key: string]: any} = {};
+                var devicesList: { [key: string]: any } = {};
                 const requestResult = response.data.map((each: any) => {
-                    devicesList[each._id]= each;
+                    devicesList[each._id] = each;
                     return createData(each._id, each.name, "available")
                 });
                 setDevices(devicesList);
-console.log(devicesList,devices);
                 if (rows !== requestResult) {
-                    
+
                     setRows(requestResult);
                     (render == 0) ? setRender(1) : setRender(0);
                 }
@@ -290,7 +278,10 @@ console.log(devicesList,devices);
         setSelected(newSelected);
     };
 
-
+    const handleChange =
+        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+            setExpanded(isExpanded ? [...expanded,panel] : expanded.filter(element => element !== panel));
+        };
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
@@ -319,10 +310,59 @@ console.log(devicesList,devices);
         [order, orderBy, page, rowsPerPage, render],
     );
 
+    const showDetailforArray=(showDetailData:Array<any>)=>{
+        return <>{showDetailData.map(each => (
+            <Accordion expanded={expanded.includes(each)} onChange={handleChange(each)}>
+                <AccordionSummary
+                    expandIcon={typeof (each) === 'string' || typeof (each) === 'number' || typeof (each) === 'boolean' ? <></> : <ExpandMoreIcon />}
+                    aria-controls={each.toString() + "-content"}
+                    id={each.toString() + "-header"}
+                >
+                    <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                    {typeof (each) === 'string' || typeof (each) === 'number'  || typeof (each) === 'boolean'? each.toString() : <></>}
+                    </Typography>
+                </AccordionSummary>
+                {Array.isArray(each) ? (
+                    <AccordionDetails>{showDetailforArray(each)}</AccordionDetails>
+                ) : (
+                    typeof (each) === 'object' && (
+                        <AccordionDetails>{showDetailforObject(each)}</AccordionDetails>
+                    )
+                )}
+            </Accordion>
+        ))}</>
+    }
+
+    const showDetailforObject = (showDetailData: any) => {
+        return <>{Object.entries(showDetailData).map(([key, value]) => (
+            <Accordion expanded={expanded.includes(key)} onChange={handleChange(key)}>
+                <AccordionSummary
+                    expandIcon={typeof (value) === 'string' || typeof (value) === 'number' || typeof (value) === 'boolean' ? <></> : <ExpandMoreIcon />}
+                    aria-controls={key + "-content"}
+                    id={key + "-header"}
+                >
+                    <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                        {key}
+                    </Typography>
+                    <Typography sx={{ color: 'text.secondary' }}>{typeof (value) === 'string' || typeof (value) === 'number'  || typeof (value) === 'boolean'?
+                     value.toString() : ''}</Typography>
+                </AccordionSummary>
+                {Array.isArray(value) ? (
+                    <AccordionDetails>{showDetailforArray(value)}</AccordionDetails>
+                ) : (
+                    typeof value === 'object' && (
+                        <AccordionDetails>{showDetailforObject(value)}</AccordionDetails>
+                    )
+                )}
+
+            </Accordion>
+        ))}</>
+    }
+
     return (
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-                <Grid item sm={12} md={6}>
+                <Grid item md={12} lg={6}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ width: '100%' }}>
                             <Paper sx={{ width: '100%', mb: 2 }}>
@@ -374,7 +414,9 @@ console.log(devicesList,devices);
                                                         >
                                                             {row.name}
                                                         </TableCell>
-                                                        <TableCell align="right">{row.status}</TableCell>
+                                                        <TableCell align="right">
+                                                        <Chip label={row.status} color={row.status==='available'?'success':row.status==='offline'?'error':'warning'}/>
+                                                        </TableCell>
                                                     </TableRow>
                                                 );
                                             })}
@@ -407,19 +449,18 @@ console.log(devicesList,devices);
                         </Box>
                     </Paper>
                 </Grid>
-                <Grid item sm={12} md={6}>
-                    <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column',minHeight:"400px" }}>
-                 <h3>{selected.length>0?selected.length>1?selected.length+' Devices Selected':devices[selected[0]].name:'None Selected'}</h3>
-                                {selected.length > 0 ? <MapComponent
-                                    locations={selected.map(each => {
-                                        return {
-                                            latitude: devices[each].latlng[0],
-                                            longitude: devices[each].latlng[1]
-                                        }
-                                    })}
-                                /> : ''}
-
-                      
+                <Grid item md={12} lg={6}>
+                    <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', minHeight: "400px" }}>
+                        <h3>{selected.length > 0 ? selected.length > 1 ? selected.length + ' Devices Selected' : devices[selected[0]].name : 'None Selected'}</h3>
+                        {selected.length > 0 ? <MapComponent
+                            locations={selected.map(each => {
+                                return {
+                                    latitude: devices[each].latlng[0],
+                                    longitude: devices[each].latlng[1]
+                                }
+                            })}
+                        /> : ''}
+                        {selected.length == 1 ? showDetailforObject(devices[selected[0]]) : ''}
                     </Paper>
                 </Grid>
             </Grid>

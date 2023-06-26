@@ -1,7 +1,7 @@
 import axios from 'axios';
 import authHeader from './auth-header';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'http://192.168.127.74:8080/api';
 const Aggio_API_URL = 'https://yggio3-beta.sensative.net/api';
 
 var token: string;

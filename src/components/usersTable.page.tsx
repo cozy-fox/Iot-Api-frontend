@@ -28,6 +28,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Chip from '@mui/material/Chip';
 type Props = {};
 
 const EnhancedTable: React.FC<Props> = () => {
@@ -434,8 +435,12 @@ const EnhancedTable: React.FC<Props> = () => {
                                                             {row.name}
                                                         </TableCell>
                                                         <TableCell align="right">{row.email}</TableCell>
-                                                        <TableCell align="right">{row.role}</TableCell>
-                                                        <TableCell align="right">{row.allowed}</TableCell>
+                                                        <TableCell align="right">
+                                                        <Chip label={row.role} color={row.role==='user'?'primary':'secondary'}/>
+                                                        </TableCell>
+                                                        <TableCell align="right"> 
+                                                        <Chip label={row.allowed} color={row.allowed==='disabled'?'error':'success'}/>
+                                                        </TableCell>
                                                     </TableRow>
                                                 );
                                             })}
