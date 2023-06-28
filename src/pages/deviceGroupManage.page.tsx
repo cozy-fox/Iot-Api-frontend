@@ -301,7 +301,6 @@ const EnhancedTable: React.FC<Props> = () => {
             var devicesList: { [key: string]: any } = {};
             const requestResult = response.data.map((each: any) => {
                 devicesList[each._id] = each;
-                console.log(each);
                 return createData(each._id, each.name, each.members.length, each.reference2usergroup.length)
             })
             setIndexedData(devicesList);

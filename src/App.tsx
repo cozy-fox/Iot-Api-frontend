@@ -20,6 +20,7 @@ import SignUp from "./pages/signup.page";
 import Login from "./pages/login.page";
 import LandingPage from "./pages/landing.page";
 import UsersGroup from "./pages/userGroupManage.page";
+import Profile from "./pages/profile.page.com";
 
 type Props = {};
 
@@ -79,6 +80,7 @@ const App: React.FC<Props> = () => {
           <Route path="/login" element={<Login  />} />
           <Route path="/register" element={<SignUp  />} />
           <Route path="/devices" element={<PrivateRoute adminPermission={false} title={"Devices Management"}><Devices /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute adminPermission={false} title={"Profile"}><Profile /></PrivateRoute>} />
           <Route path="/device_group" element={<PrivateRoute adminPermission={false} title={"Devices Group Management"}><DevicesGroup /></PrivateRoute>} />
           <Route path="/users" element={<PrivateRoute adminPermission={true} title={"Users Management"}><Users   /></PrivateRoute>} />
           <Route path="/user_group" element={<PrivateRoute adminPermission={true} title={"User Group Management"}><UsersGroup   /></PrivateRoute>} />

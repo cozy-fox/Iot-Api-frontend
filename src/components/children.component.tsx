@@ -29,7 +29,6 @@ export default function Dashboard
         mainData: any,
         data4selection: Array<any>
     }) {
-    console.log(selected, data4selection, mainData)
     return (<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ width: '100%', minHeight: '300px' }}>
             <Toolbar

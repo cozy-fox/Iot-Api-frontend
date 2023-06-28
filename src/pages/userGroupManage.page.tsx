@@ -303,7 +303,6 @@ const EnhancedTable: React.FC<Props> = () => {
         userService.getUserGroups().then((response) => {
             var devicesList: { [key: string]: any } = {};
             const requestResult = response.data.map((each: any) => {
-                console.log(each);
                 devicesList[each._id] = each;
                 return createData(each._id, each.name, each.members.length, each.reference2devicegroup.length)
             })

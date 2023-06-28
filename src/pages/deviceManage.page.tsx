@@ -29,18 +29,20 @@ import Chip from '@mui/material/Chip';
 interface Data {
     deviceId: string;
     name: string;
+    connectedGroup: number,
     status: string;
 }
 
 function createData(
     deviceId: string,
     name: string,
+    connectedGroup: number,
     status: string
 ): Data {
     return {
-
         deviceId,
         name,
+        connectedGroup,
         status
     };
 }
@@ -96,8 +98,12 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: true,
         label: 'DeviceName',
-    },
-    {
+    },{
+        id: 'connectedGroup',
+        numeric: true,
+        disablePadding: true,
+        label: 'Related Groups',
+    },{
         id: 'status',
         numeric: true,
         disablePadding: false,
@@ -217,11 +223,10 @@ export default function EnhancedTable() {
 
     useEffect(() => {
         userService.getDevices4Admin().then((response) => {
-            console.log(response.data);
             var devicesList: { [key: string]: any } = {};
             const requestResult = response.data.map((each: any) => {
                 devicesList[each._id] = each.data;
-                return createData(each._id, each.name, "available")
+                return createData(each._id, each.name, each.group.length, "available")
             });
             setDevices(devicesList);
             if (rows !== requestResult) {
@@ -271,7 +276,7 @@ export default function EnhancedTable() {
 
     const handleChange =
         (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-            setExpanded(isExpanded ? [...expanded,panel] : expanded.filter(element => element !== panel));
+            setExpanded(isExpanded ? [...expanded, panel] : expanded.filter(element => element !== panel));
         };
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -301,7 +306,7 @@ export default function EnhancedTable() {
         [order, orderBy, page, rowsPerPage, render],
     );
 
-    const showDetailforArray=(showDetailData:Array<any>)=>{
+    const showDetailforArray = (showDetailData: Array<any>) => {
         return <>{showDetailData.map(each => (
             <Accordion expanded={expanded.includes(each)} onChange={handleChange(each)}>
                 <AccordionSummary
@@ -310,7 +315,7 @@ export default function EnhancedTable() {
                     id={each.toString() + "-header"}
                 >
                     <Typography sx={{ width: '33%', flexShrink: 0 }}>
-                    {typeof (each) === 'string' || typeof (each) === 'number'  || typeof (each) === 'boolean'? each.toString() : <></>}
+                        {typeof (each) === 'string' || typeof (each) === 'number' || typeof (each) === 'boolean' ? each.toString() : <></>}
                     </Typography>
                 </AccordionSummary>
                 {Array.isArray(each) ? (
@@ -335,8 +340,8 @@ export default function EnhancedTable() {
                     <Typography sx={{ width: '33%', flexShrink: 0 }}>
                         {key}
                     </Typography>
-                    <Typography sx={{ color: 'text.secondary' }}>{typeof (value) === 'string' || typeof (value) === 'number'  || typeof (value) === 'boolean'?
-                     value.toString() : ''}</Typography>
+                    <Typography sx={{ color: 'text.secondary' }}>{typeof (value) === 'string' || typeof (value) === 'number' || typeof (value) === 'boolean' ?
+                        value.toString() : ''}</Typography>
                 </AccordionSummary>
                 {Array.isArray(value) ? (
                     <AccordionDetails>{showDetailforArray(value)}</AccordionDetails>
@@ -406,7 +411,10 @@ export default function EnhancedTable() {
                                                             {row.name}
                                                         </TableCell>
                                                         <TableCell align="right">
-                                                        <Chip label={row.status} color={row.status==='available'?'success':row.status==='offline'?'error':'warning'}/>
+                                                            {row.connectedGroup}
+                                                        </TableCell>
+                                                        <TableCell align="right">
+                                                            <Chip label={row.status} color={row.status === 'available' ? 'success' : row.status === 'offline' ? 'error' : 'warning'} />
                                                         </TableCell>
                                                     </TableRow>
                                                 );

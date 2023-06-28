@@ -40,6 +40,7 @@ const EnhancedTable: React.FC<Props> = () => {
     interface Data {
         id: string;
         name: string;
+        connectedGroup:number;
         email: string;
         role: string;
         allowed: string;
@@ -48,6 +49,7 @@ const EnhancedTable: React.FC<Props> = () => {
     function createData(
         id: string,
         name: string,
+        connectedGroup:number,
         email: string,
         role: string,
         allowed: string
@@ -55,6 +57,7 @@ const EnhancedTable: React.FC<Props> = () => {
         return {
             id,
             name,
+            connectedGroup,
             email,
             role,
             allowed
@@ -112,8 +115,12 @@ const EnhancedTable: React.FC<Props> = () => {
             numeric: false,
             disablePadding: true,
             label: 'Name',
-        },
-        {
+        },{
+            id: 'connectedGroup',
+            numeric: true,
+            disablePadding: true,
+            label: 'Related Group',
+        },{
             id: 'email',
             numeric: true,
             disablePadding: false,
@@ -270,7 +277,7 @@ const EnhancedTable: React.FC<Props> = () => {
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(20);
-    const [rows, setRows] = useState<Data[]>([{ id: "", name: "", email: "", role: "user", allowed: "disabled" }]);
+    const [rows, setRows] = useState<Data[]>([]);
     const [render, setRender] = useState<Number>(0);
     const [open, setOpen] = React.useState(false);
 
@@ -299,7 +306,7 @@ const EnhancedTable: React.FC<Props> = () => {
     const getUsers = () => {
         userService.getUsers().then((response) => {
             const requestResult = response.data.map((each: any) => {
-                return createData(each._id, each.username, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
+                return createData(each._id, each.username,each.group.length, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
             })
             if (rows !== requestResult) {
                 setRows(requestResult);
@@ -434,6 +441,7 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         >
                                                             {row.name}
                                                         </TableCell>
+                                                        <TableCell align="right">{row.connectedGroup}</TableCell>
                                                         <TableCell align="right">{row.email}</TableCell>
                                                         <TableCell align="right">
                                                         <Chip label={row.role} color={row.role==='user'?'primary':'secondary'}/>
