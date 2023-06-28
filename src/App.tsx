@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
+import "./style/App.css";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -20,7 +20,7 @@ import SignUp from "./pages/signup.page";
 import Login from "./pages/login.page";
 import LandingPage from "./pages/landing.page";
 import UsersGroup from "./pages/userGroupManage.page";
-import Profile from "./pages/profile.page.com";
+import Profile from "./pages/profile.page";
 
 type Props = {};
 

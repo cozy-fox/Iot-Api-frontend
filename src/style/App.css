@@ -30,3 +30,20 @@ label {
   -webkit-border-radius: 50%;
   border-radius: 50%;
 }
+
+.login-background{
+  background-image: url('../asset/background.jpg');
+}
+
+.signup-background{
+  background-image: url('../asset/background (1).webp');
+  height:100vh;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -98,12 +98,12 @@ const headCells: readonly HeadCell[] = [
         numeric: false,
         disablePadding: true,
         label: 'DeviceName',
-    },{
+    }, {
         id: 'connectedGroup',
         numeric: true,
         disablePadding: true,
         label: 'Related Groups',
-    },{
+    }, {
         id: 'status',
         numeric: true,
         disablePadding: false,
@@ -222,11 +222,11 @@ export default function EnhancedTable() {
     const [expanded, setExpanded] = useState<Array<string>>([]);
 
     useEffect(() => {
-        userService.getDevices4Admin().then((response) => {
+        userService.getDevices().then((response) => {
             var devicesList: { [key: string]: any } = {};
             const requestResult = response.data.map((each: any) => {
                 devicesList[each._id] = each.data;
-                return createData(each._id, each.name, each.group.length, "available")
+                return createData(each._id, each.name, each.group.length, each.status)
             });
             setDevices(devicesList);
             if (rows !== requestResult) {
@@ -385,7 +385,6 @@ export default function EnhancedTable() {
                                                 return (
                                                     <TableRow
                                                         hover
-                                                        onClick={(event) => handleClick(event, row.deviceId)}
                                                         role="checkbox"
                                                         aria-checked={isItemSelected}
                                                         tabIndex={-1}
@@ -394,7 +393,7 @@ export default function EnhancedTable() {
                                                         sx={{ cursor: 'pointer' }}
                                                     >
                                                         <TableCell padding="checkbox">
-                                                            <Checkbox
+                                                            <Checkbox onClick={(event) => handleClick(event, row.deviceId)}
                                                                 color="primary"
                                                                 checked={isItemSelected}
                                                                 inputProps={{
@@ -402,7 +401,7 @@ export default function EnhancedTable() {
                                                                 }}
                                                             />
                                                         </TableCell>
-                                                        <TableCell
+                                                        <TableCell onClick={(event) => setSelected([row.deviceId])}
                                                             component="th"
                                                             id={labelId}
                                                             scope="row"
@@ -410,10 +409,10 @@ export default function EnhancedTable() {
                                                         >
                                                             {row.name}
                                                         </TableCell>
-                                                        <TableCell align="right">
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.deviceId])}>
                                                             {row.connectedGroup}
                                                         </TableCell>
-                                                        <TableCell align="right">
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.deviceId])}>
                                                             <Chip label={row.status} color={row.status === 'available' ? 'success' : row.status === 'offline' ? 'error' : 'warning'} />
                                                         </TableCell>
                                                     </TableRow>

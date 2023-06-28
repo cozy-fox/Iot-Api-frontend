@@ -207,59 +207,17 @@ const EnhancedTable: React.FC<Props> = () => {
         });
     }
 
-    function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-        const { numSelected } = props;
-
-        const rename = () => {
-            deviceService.renameGroup({ selectedDevices: numSelected, newName: inputValue }).then(response => {
-                setAlert({ message: response.data.message, successful: true, open: true });
-                getGroups();
-                setSelected([]);
-                setInputValue('');
-            }).catch(error => {
-                const resMessage = (error.response && error.response.data &&
-                    error.response.data.message) || error.message || error.toString();
-                setAlert({ message: resMessage, successful: false, open: true });
-            });
-        }
-
-        return (
-            <Toolbar
-                sx={{
-                    pl: { sm: 2 },
-                    pr: { xs: 1, sm: 1 },
-                    ...(numSelected.length > 0 && {
-                        bgcolor: (theme) =>
-                            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                    }),
-                }}
-            >
-                <Typography
-                    sx={{ flex: '1 1 100%' }}
-                    color="inherit"
-                    variant="subtitle1"
-                    component="div"
-                >
-                    {numSelected.length > 0 ? `${numSelected.length} selected` : 'Device Group Management'}
-                </Typography>
-                <Stack direction="row" spacing={2}>
-                    <TextField id="outlined-basic" variant="outlined" size='small'
-                        value={inputValue}
-                        onChange={(event) => { setInputValue(event.target.value) }} />
-                    <Button variant="contained" color="success" onClick={() => createGroup()}  >
-                        Create
-                    </Button>
-                    <Button variant="contained" color="primary" disabled={numSelected.length === 0} onClick={() => rename()}>
-                        Rename
-                    </Button>
-                </Stack>
-                <Tooltip title="Delete">
-                    <IconButton disabled={numSelected.length === 0} onClick={dialogOpen}>
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip>
-            </Toolbar>
-        );
+    const rename = () => {
+        deviceService.renameGroup({ selectedDevices: selected, newName: inputValue }).then(response => {
+            setAlert({ message: response.data.message, successful: true, open: true });
+            getGroups();
+            setSelected([]);
+            setInputValue('');
+        }).catch(error => {
+            const resMessage = (error.response && error.response.data &&
+                error.response.data.message) || error.message || error.toString();
+            setAlert({ message: resMessage, successful: false, open: true });
+        });
     }
 
     const dialogOpen = () => {
@@ -394,7 +352,41 @@ const EnhancedTable: React.FC<Props> = () => {
                         <Box sx={{ width: '100%' }}>
                             <Paper sx={{ width: '100%', mb: 2 }}>
                                 <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose} />
-                                <EnhancedTableToolbar numSelected={selected} />
+                                <Toolbar
+                                    sx={{
+                                        pl: { sm: 2 },
+                                        pr: { xs: 1, sm: 1 },
+                                        ...(selected.length > 0 && {
+                                            bgcolor: (theme) =>
+                                                alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                                        }),
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{ flex: '1 1 100%' }}
+                                        color="inherit"
+                                        variant="subtitle1"
+                                        component="div"
+                                    >
+                                        {selected.length > 0 ? `${selected.length} selected` : 'Device Group Management'}
+                                    </Typography>
+                                    <Stack direction="row" spacing={2}>
+                                        <TextField id="outlined-basic" variant="outlined" size='small'
+                                            value={inputValue}
+                                            onChange={(event) => { setInputValue(event.target.value) }} />
+                                        <Button variant="contained" color="success" onClick={() => createGroup()}  >
+                                            Create
+                                        </Button>
+                                        <Button variant="contained" color="primary" disabled={selected.length === 0} onClick={() => rename()}>
+                                            Rename
+                                        </Button>
+                                    </Stack>
+                                    <Tooltip title="Delete">
+                                        <IconButton disabled={selected.length === 0} onClick={dialogOpen}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Toolbar>
                                 <TableContainer>
                                     <Table
                                         sx={{ minWidth: 250 }}
@@ -416,7 +408,6 @@ const EnhancedTable: React.FC<Props> = () => {
                                                 return (
                                                     <TableRow
                                                         hover
-                                                        onClick={(event) => handleClick(event, row.id)}
                                                         role="checkbox"
                                                         aria-checked={isItemSelected}
                                                         tabIndex={-1}
@@ -427,13 +418,14 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         <TableCell padding="checkbox">
                                                             <Checkbox
                                                                 color="primary"
+                                                                onClick={(event) => handleClick(event, row.id)}
                                                                 checked={isItemSelected}
                                                                 inputProps={{
                                                                     'aria-labelledby': labelId,
                                                                 }}
                                                             />
                                                         </TableCell>
-                                                        <TableCell
+                                                        <TableCell onClick={(event) => setSelected([row.id])}
                                                             component="th"
                                                             id={labelId}
                                                             scope="row"
@@ -441,8 +433,8 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         >
                                                             {row.name}
                                                         </TableCell>
-                                                        <TableCell align="right">{row.members}</TableCell>
-                                                        <TableCell align="right">{row.devices}</TableCell>
+                                                        <TableCell onClick={(event) => setSelected([row.id])} align="right">{row.members}</TableCell>
+                                                        <TableCell onClick={(event) => setSelected([row.id])} align="right">{row.devices}</TableCell>
                                                     </TableRow>
                                                 );
                                             })}

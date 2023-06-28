@@ -11,23 +11,21 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Navigate } from "react-router-dom";
+import { Navigate,useNavigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
 import Alert from "../components/alert.component";
 import Link from '@mui/material/Link';
-
-type Props = {
-  setAlert: (alert: { message: string; successful: boolean; open: boolean }) => void;
-};
+import {Copyright} from "../components/copyright.component";
 
 
 const defaultTheme = createTheme();
 
-const SignInSide =() => {
+const SignInSide = () => {
+  const navigate = useNavigate();
   const [alert, setAlert] = useState({ message: '', successful: true, open: false });
 
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    setAlert({...alert, open: false } );
+    setAlert({ ...alert, open: false });
   };
 
 
@@ -40,7 +38,7 @@ const SignInSide =() => {
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-   
+
     event.preventDefault();
 
     const data = new FormData(event.currentTarget);
@@ -49,14 +47,14 @@ const SignInSide =() => {
     const password = data.get('password') as string;
 
     if (typeof (username) !== 'string' || username.length < 3) {
-      
-      setAlert({message:'Username must be over 3 letters', successful:false, open:true});
+
+      setAlert({ message: 'Username must be over 3 letters', successful: false, open: true });
     } else if (typeof (password) !== 'string' || password.length < 8) {
-      setAlert({message:'Password should be over 8 letters', successful:false, open:true});
+      setAlert({ message: 'Password should be over 8 letters', successful: false, open: true });
     } else {
       AuthService.login(username, password).then(
         () => {
-          setAlert({message:"Login Successfully", successful:true, open:true});
+          setAlert({ message: "Login Successfully", successful: true, open: true });
           setRedirect("/devices");
         },
         error => {
@@ -66,7 +64,7 @@ const SignInSide =() => {
               error.response.data.message) ||
             error.message ||
             error.toString();
-            setAlert({message:resMessage, successful:false, open:true});
+          setAlert({ message: resMessage, successful: false, open: true });
           setLoading(false);
 
         }
@@ -77,16 +75,17 @@ const SignInSide =() => {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose}/>
+      <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose} />
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
+          className='login-background'
           item
           xs={false}
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
+            backgroundImage: 'background.jpg',
             backgroundRepeat: 'no-repeat',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
@@ -99,15 +98,15 @@ const SignInSide =() => {
             sx={{
               my: 8,
               mx: 4,
-              display: 'flex',
+              display: 'flex',                                                                                                                                                  
               flexDirection: 'column',
               alignItems: 'center',
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
+             <div className='logo'><img src='logo.png' style={{ width: '50%', marginBottom: '20px', cursor: 'pointer'}} onClick={() => { navigate('/') }}>
+              </img></div>
+                              
+            <Typography component="h1" variant="h5" align='center'>
               Yiggo Iot Sensor Management
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
@@ -153,11 +152,14 @@ const SignInSide =() => {
                   <Link href={'/register'} variant="body2">
                     {"Don't have an account? Sign Up"}
                   </Link>
-                  
+
                 </Grid>
+                
               </Grid>
             </Box>
+            
           </Box>
+          <Copyright/>
         </Grid>
       </Grid>
     </ThemeProvider>

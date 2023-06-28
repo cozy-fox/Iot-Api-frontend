@@ -70,7 +70,7 @@ const EnhancedTable: React.FC<Props> = () => {
     const [rows, setRows] = useState<Data[]>([]);
     const [render, setRender] = useState<Number>(0);
     const [open, setDialogOpen] = React.useState(false);
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState<string>('');
     const [alert, setAlert] = useState({ message: '', successful: true, open: false });
     const [indexedData, setIndexedData] = useState<any>({});
     const [data4select, setData4select] = useState<{ devices: { label: string, value: string }[], users: { label: string, value: string }[] }>
@@ -199,8 +199,8 @@ const EnhancedTable: React.FC<Props> = () => {
         );
     }
 
-    const updateUserGroups = (field: string, value: string, newMember:string) => {
-        userService.updateUserGroups({ selected:selected[0] , field: field, value: value,newMember:newMember }).then(response => {
+    const updateUserGroups = (field: string, value: string, newMember: string) => {
+        userService.updateUserGroups({ selected: selected[0], field: field, value: value, newMember: newMember }).then(response => {
             setAlert({ message: response.data.message, successful: true, open: true });
             getGroups();
         }).catch(error => {
@@ -210,59 +210,17 @@ const EnhancedTable: React.FC<Props> = () => {
         });
     }
 
-    function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-        const { numSelected } = props;
-
-        const rename = () => {
-            userService.renameGroup({ selectedUsers: numSelected, newName: inputValue }).then(response => {
-                setAlert({ message: response.data.message, successful: true, open: true });
-                getGroups();
-                setSelected([]);
-                setInputValue('');
-            }).catch(error => {
-                const resMessage = (error.response && error.response.data &&
-                    error.response.data.message) || error.message || error.toString();
-                setAlert({ message: resMessage, successful: false, open: true });
-            });
-        }
-
-        return (
-            <Toolbar
-                sx={{
-                    pl: { sm: 2 },
-                    pr: { xs: 1, sm: 1 },
-                    ...(numSelected.length > 0 && {
-                        bgcolor: (theme) =>
-                            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                    }),
-                }}
-            >
-                <Typography
-                    sx={{ flex: '1 1 100%' }}
-                    color="inherit"
-                    variant="subtitle1"
-                    component="div"
-                >
-                    {numSelected.length > 0 ? `${numSelected.length} selected` : 'User Group Management'}
-                </Typography>
-                <Stack direction="row" spacing={2}>
-                    <TextField id="outlined-basic" variant="outlined" size='small'
-                        value={inputValue}
-                        onChange={(event) => { setInputValue(event.target.value) }} />
-                    <Button variant="contained" color="success" onClick={() => createGroup()}  >
-                        Create
-                    </Button>
-                    <Button variant="contained" color="primary" disabled={numSelected.length === 0} onClick={() => rename()}>
-                        Rename
-                    </Button>
-                </Stack>
-                <Tooltip title="Delete">
-                    <IconButton disabled={numSelected.length === 0} onClick={dialogOpen}>
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip>
-            </Toolbar>
-        );
+    const rename = () => {
+        userService.renameGroup({ selectedUsers: selected, newName: inputValue }).then(response => {
+            setAlert({ message: response.data.message, successful: true, open: true });
+            getGroups();
+            setSelected([]);
+            setInputValue('');
+        }).catch(error => {
+            const resMessage = (error.response && error.response.data &&
+                error.response.data.message) || error.message || error.toString();
+            setAlert({ message: resMessage, successful: false, open: true });
+        });
     }
 
     const dialogOpen = () => {
@@ -397,7 +355,42 @@ const EnhancedTable: React.FC<Props> = () => {
                         <Box sx={{ width: '100%' }}>
                             <Paper sx={{ width: '100%', mb: 2 }}>
                                 <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose} />
-                                <EnhancedTableToolbar numSelected={selected} />
+                                <Toolbar
+                                    sx={{
+                                        pl: { sm: 2 },
+                                        pr: { xs: 1, sm: 1 },
+                                        ...(selected.length > 0 && {
+                                            bgcolor: (theme) =>
+                                                alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                                        }),
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{ flex: '1 1 100%' }}
+                                        color="inherit"
+                                        variant="subtitle1"
+                                        component="div"
+                                    >
+                                        {selected.length > 0 ? `${selected.length} selected` : 'User Group Management'}
+                                    </Typography>
+                                    <Stack direction="row" spacing={2}>
+                                        <TextField id="outlined-basic" variant="outlined" size='small'
+                                            value={inputValue}
+                                            onChange={(event) => { setInputValue(event.target.value); }} />
+
+                                        <Button variant="contained" color="success" onClick={() => createGroup()}  >
+                                            Create
+                                        </Button>
+                                        <Button variant="contained" color="primary" disabled={selected.length === 0} onClick={() => rename()}>
+                                            Rename
+                                        </Button>
+                                    </Stack>
+                                    <Tooltip title="Delete">
+                                        <IconButton disabled={selected.length === 0} onClick={dialogOpen}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Toolbar>
                                 <TableContainer>
                                     <Table
                                         sx={{ minWidth: 250 }}
@@ -419,7 +412,6 @@ const EnhancedTable: React.FC<Props> = () => {
                                                 return (
                                                     <TableRow
                                                         hover
-                                                        onClick={(event) => handleClick(event, row.id)}
                                                         role="checkbox"
                                                         aria-checked={isItemSelected}
                                                         tabIndex={-1}
@@ -428,7 +420,7 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         sx={{ cursor: 'pointer' }}
                                                     >
                                                         <TableCell padding="checkbox">
-                                                            <Checkbox
+                                                            <Checkbox onClick={(event) => handleClick(event, row.id)}
                                                                 color="primary"
                                                                 checked={isItemSelected}
                                                                 inputProps={{
@@ -436,7 +428,7 @@ const EnhancedTable: React.FC<Props> = () => {
                                                                 }}
                                                             />
                                                         </TableCell>
-                                                        <TableCell
+                                                        <TableCell onClick={(event) => setSelected([row.id])}
                                                             component="th"
                                                             id={labelId}
                                                             scope="row"
@@ -444,8 +436,8 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         >
                                                             {row.name}
                                                         </TableCell>
-                                                        <TableCell align="right">{row.members}</TableCell>
-                                                        <TableCell align="right">{row.devices}</TableCell>
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.members}</TableCell>
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.devices}</TableCell>
                                                     </TableRow>
                                                 );
                                             })}
@@ -492,10 +484,11 @@ const EnhancedTable: React.FC<Props> = () => {
                                 label="Dense padding"
                             />
                         </Box>
+
                     </Paper>
                 </Grid>
                 <Grid item md={12} lg={6}>
-                <Children
+                    <Children
                         title={"Users"}
                         addMember={(newValue: string) => { updateUserGroups("members", "add", newValue) }}
                         deleteMember={(newValue: string) => { updateUserGroups("members", "delete", newValue) }}

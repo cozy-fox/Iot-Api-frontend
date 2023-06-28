@@ -35,7 +35,7 @@ function LandingPage() {
                         <div className="framer-1d4efzn" data-framer-name="Squiggle 8" style={{ height: '100%', width: '100%' }}>
                           <div className="framer-6x4gig" data-framer-name="Squiggle 8">
                             <div style={{ position: 'absolute', pointerEvents: 'none', userSelect: 'none', borderRadius: 'inherit', top: 0, right: 0, bottom: 0, left: 0 }} data-framer-background-image-wrapper="true">
-                              <div style={{ display: 'contents', borderRadius: 'inherit', pointerEvents: 'none' }}><img src="https://framerusercontent.com/images/gLVL2QaC3h4gJOhk25C4EFGtqfY.png" alt="gLVL2QaC3h4gJOhk25C4EFGtqfY" srcSet="https://framerusercontent.com/images/gLVL2QaC3h4gJOhk25C4EFGtqfY.png?scale-down-to=512 512w, https://framerusercontent.com/images/gLVL2QaC3h4gJOhk25C4EFGtqfY.png?scale-down-to=1024 1024w, https://framerusercontent.com/images/gLVL2QaC3h4gJOhk25C4EFGtqfY.png 1600w" sizes="(min-width: 1200px) 800px, (max-width: 809px) 800px, (min-width: 810px) and (max-width: 1199px) 800px" style={{ pointerEvents: 'none', userSelect: 'none', display: 'block', width: '100%', height: '100%', borderRadius: 'inherit', objectPosition: 'center', objectFit: 'cover', imageRendering: 'auto' }} data-framer-original-sizes="800px" /></div>
+                              <div style={{ display: 'contents', borderRadius: 'inherit', pointerEvents: 'none' }}><img src="../asset/logo.png" alt="gLVL2QaC3h4gJOhk25C4EFGtqfY" srcSet="https://framerusercontent.com/images/gLVL2QaC3h4gJOhk25C4EFGtqfY.png?scale-down-to=512 512w, https://framerusercontent.com/images/gLVL2QaC3h4gJOhk25C4EFGtqfY.png?scale-down-to=1024 1024w, https://framerusercontent.com/images/gLVL2QaC3h4gJOhk25C4EFGtqfY.png 1600w" sizes="(min-width: 1200px) 800px, (max-width: 809px) 800px, (min-width: 810px) and (max-width: 1199px) 800px" style={{ pointerEvents: 'none', userSelect: 'none', display: 'block', width: '100%', height: '100%', borderRadius: 'inherit', objectPosition: 'center', objectFit: 'cover', imageRendering: 'auto' }} data-framer-original-sizes="800px" /></div>
                             </div>
                           </div>
                         </div>
@@ -338,7 +338,7 @@ function LandingPage() {
                   </div>
                 </div>
                 <div className="framer-ds4uio" style={{ outline: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', flexShrink: 0, transform: 'none' }} data-framer-component-type="RichTextContainer">
-                  <p style={{ fontSelector: 'R0Y7TnVuaXRvLXJlZ3VsYXI=', fontFamily: '"Nunito", "Nunito Placeholder", sans-serif', lineHeight: '1.5em', textAlign: 'center' }} className="framer-text">© Yiggo 2023</p>
+                  <p style={{ fontSelector: 'R0Y7TnVuaXRvLXJlZ3VsYXI=', fontFamily: '"Nunito", "Nunito Placeholder", sans-serif', lineHeight: '1.5em', textAlign: 'center' }} className="framer-text"><a href="https://www.netlinksdn.com" target="_blank">© NetLinkSDN 2023</a></p>
                 </div>
               </div >
             </div >

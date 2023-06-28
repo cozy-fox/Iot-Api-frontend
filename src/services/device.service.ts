@@ -5,8 +5,8 @@ const API_URL = 'http://192.168.127.74:8080/api';
 
 class DeviceService {
 
-  getDevices4Admin() {
-    return axios.get(API_URL + '/devices/admin', { headers: authHeader() });
+  getDevices() {
+    return axios.get(API_URL + '/devices', { headers: authHeader() });
   }
 
 

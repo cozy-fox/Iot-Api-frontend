@@ -40,7 +40,7 @@ const EnhancedTable: React.FC<Props> = () => {
     interface Data {
         id: string;
         name: string;
-        connectedGroup:number;
+        connectedGroup: number;
         email: string;
         role: string;
         allowed: string;
@@ -49,7 +49,7 @@ const EnhancedTable: React.FC<Props> = () => {
     function createData(
         id: string,
         name: string,
-        connectedGroup:number,
+        connectedGroup: number,
         email: string,
         role: string,
         allowed: string
@@ -115,12 +115,12 @@ const EnhancedTable: React.FC<Props> = () => {
             numeric: false,
             disablePadding: true,
             label: 'Name',
-        },{
+        }, {
             id: 'connectedGroup',
             numeric: true,
             disablePadding: true,
             label: 'Related Group',
-        },{
+        }, {
             id: 'email',
             numeric: true,
             disablePadding: false,
@@ -306,7 +306,7 @@ const EnhancedTable: React.FC<Props> = () => {
     const getUsers = () => {
         userService.getUsers().then((response) => {
             const requestResult = response.data.map((each: any) => {
-                return createData(each._id, each.username,each.group.length, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
+                return createData(each._id, each.username, each.group.length, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
             })
             if (rows !== requestResult) {
                 setRows(requestResult);
@@ -416,7 +416,6 @@ const EnhancedTable: React.FC<Props> = () => {
                                                 return (
                                                     <TableRow
                                                         hover
-                                                        onClick={(event) => handleClick(event, row.id)}
                                                         role="checkbox"
                                                         aria-checked={isItemSelected}
                                                         tabIndex={-1}
@@ -425,7 +424,7 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         sx={{ cursor: 'pointer' }}
                                                     >
                                                         <TableCell padding="checkbox">
-                                                            <Checkbox
+                                                            <Checkbox onClick={(event) => handleClick(event, row.id)}
                                                                 color="primary"
                                                                 checked={isItemSelected}
                                                                 inputProps={{
@@ -433,7 +432,7 @@ const EnhancedTable: React.FC<Props> = () => {
                                                                 }}
                                                             />
                                                         </TableCell>
-                                                        <TableCell
+                                                        <TableCell onClick={(event) => setSelected([row.id])}
                                                             component="th"
                                                             id={labelId}
                                                             scope="row"
@@ -441,13 +440,13 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         >
                                                             {row.name}
                                                         </TableCell>
-                                                        <TableCell align="right">{row.connectedGroup}</TableCell>
-                                                        <TableCell align="right">{row.email}</TableCell>
-                                                        <TableCell align="right">
-                                                        <Chip label={row.role} color={row.role==='user'?'primary':'secondary'}/>
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.connectedGroup}</TableCell>
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.email}</TableCell>
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>
+                                                            <Chip label={row.role} color={row.role === 'user' ? 'primary' : 'secondary'} />
                                                         </TableCell>
-                                                        <TableCell align="right"> 
-                                                        <Chip label={row.allowed} color={row.allowed==='disabled'?'error':'success'}/>
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>
+                                                            <Chip label={row.allowed} color={row.allowed === 'disabled' ? 'error' : 'success'} />
                                                         </TableCell>
                                                     </TableRow>
                                                 );

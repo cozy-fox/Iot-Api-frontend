@@ -1982,7 +1982,7 @@ html,
             width: 1200px
         }
         .background-image {
-            background-image: url('background.jpg');
+            background-image: url('../asset/background (2).jpg');
             background-size: cover;
             position: relative;
             height: 500px;
