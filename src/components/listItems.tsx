@@ -3,60 +3,61 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import PowerIcon from '@mui/icons-material/Power';
 import PeopleIcon from '@mui/icons-material/People';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import MapIcon from '@mui/icons-material/Map';
+import PersonIcon from '@mui/icons-material/Person';
+import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputComponent';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { Link } from 'react-router-dom';
 import authService from "./../services/auth.service";
 import { useNavigate } from "react-router-dom";
-
-
 
 export const MainListItems = () => {
   const navigate = useNavigate();
   return (<React.Fragment>
     <ListItemButton onClick={() => { navigate('/devices') }}>
       <ListItemIcon>
-        <DashboardIcon />
+        <PowerIcon />
       </ListItemIcon>
       <ListItemText primary="Devices" />
     </ListItemButton>
     {authService.getCurrentUser().roles === 'admin' ?
+      <ListItemButton  onClick={() => { navigate('/device_group') }}>
+      <ListItemIcon>
+        <SettingsInputComponentIcon />
+      </ListItemIcon>
+      <ListItemText primary="Device Group" />
+    </ListItemButton>
+      : <></>}
+    {authService.getCurrentUser().roles === 'admin' ?
       <ListItemButton onClick={() => { navigate('/users') }}>
         <ListItemIcon>
-          <PeopleIcon />
+          <PersonIcon />
         </ListItemIcon>
         <ListItemText primary="Users" />
       </ListItemButton>
       : <></>}
-    <ListItemButton>
-      <ListItemIcon>
-        <BarChartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Chart" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <MapIcon />
-      </ListItemIcon>
-      <ListItemText primary="Map" />
-    </ListItemButton>
+      {authService.getCurrentUser().roles === 'admin' ?
+      <ListItemButton onClick={() => { navigate('/user_group') }}>
+        <ListItemIcon>
+        <PeopleIcon />
+        </ListItemIcon>
+        <ListItemText primary="User Group" />
+      </ListItemButton>
+      : <></>}
   </React.Fragment>)
-
 };
 
-export const secondaryListItems = (
-  <React.Fragment>
+export const SecondaryListItems = ()=>{
+  const navigate = useNavigate();
+  return(<React.Fragment>
     <ListSubheader component="div" inset>
-      Additional
+      Additional Info
     </ListSubheader>
-    <ListItemButton>
+    <ListItemButton onClick={() => { navigate('/profile') }}>
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>
-      <ListItemText primary="Additional Info" />
+      <ListItemText primary="Profile" />
     </ListItemButton>
-  </React.Fragment>
-);
+  </React.Fragment>)
+}

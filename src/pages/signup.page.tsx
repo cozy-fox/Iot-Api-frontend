@@ -14,7 +14,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import AuthService from "../services/auth.service";
 import { useNavigate } from "react-router-dom";
-import Alert from "./alert.component";
+import Alert from "../components/alert.component";
 
 type Props = {};
 

@@ -1,19 +1,25 @@
-import SignUp from "./components/signup.page";
-import Login from "./components/login.page";
-import LandingPage from "./components/landing.page";
+
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-import Header from './components/header.component';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Devices from './components/deviceTable.page';
+
+//components
+import Header from './components/header.component';
 import authService from "./services/auth.service";
-import Users from "./components/usersTable.page";
 import Alert from "./components/alert.component";
 
+//pages
+import Devices from './pages/deviceManage.page';
+import DevicesGroup from './pages/deviceGroupManage.page';
+import Users from "./pages/usersManage.page";
+import SignUp from "./pages/signup.page";
+import Login from "./pages/login.page";
+import LandingPage from "./pages/landing.page";
+import UsersGroup from "./pages/userGroupManage.page";
 
 type Props = {};
 
@@ -72,8 +78,10 @@ const App: React.FC<Props> = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login  />} />
           <Route path="/register" element={<SignUp  />} />
-          <Route path="/devices" element={<PrivateRoute adminPermission={false} title={"Devices"}><Devices /></PrivateRoute>} />
-          <Route path="/users" element={<PrivateRoute adminPermission={true} title={"Users"}><Users   /></PrivateRoute>} />
+          <Route path="/devices" element={<PrivateRoute adminPermission={false} title={"Devices Management"}><Devices /></PrivateRoute>} />
+          <Route path="/device_group" element={<PrivateRoute adminPermission={false} title={"Devices Group Management"}><DevicesGroup /></PrivateRoute>} />
+          <Route path="/users" element={<PrivateRoute adminPermission={true} title={"Users Management"}><Users   /></PrivateRoute>} />
+          <Route path="/user_group" element={<PrivateRoute adminPermission={true} title={"User Group Management"}><UsersGroup   /></PrivateRoute>} />
         </Routes>
         <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose}/>
       </div>

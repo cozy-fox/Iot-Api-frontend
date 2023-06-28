@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Navigate } from "react-router-dom";
 import AuthService from "../services/auth.service";
-import Alert from "./alert.component";
+import Alert from "../components/alert.component";
 import Link from '@mui/material/Link';
 
 type Props = {

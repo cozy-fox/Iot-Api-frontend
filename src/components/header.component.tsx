@@ -14,7 +14,7 @@ import Badge from '@mui/material/Badge';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { MainListItems, secondaryListItems } from './listItems';
+import { MainListItems, SecondaryListItems } from './listItems';
 import AuthService from "../services/auth.service";
 import {useNavigate } from "react-router-dom";
 
@@ -144,7 +144,7 @@ export default function Dashboard({title}:{title:string}) {
           <List component="nav">
             <MainListItems></MainListItems>
             <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
+            <SecondaryListItems/>
           </List>
         </Drawer>
     </>

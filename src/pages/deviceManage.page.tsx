@@ -15,10 +15,10 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { visuallyHidden } from '@mui/utils';
 import React, { useEffect, useState } from 'react';
-import userService from '../services/user.service';
+import userService from '../services/device.service';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import MapComponent from './map.component';
+import MapComponent from '../components/map.component';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -216,28 +216,19 @@ export default function EnhancedTable() {
     const [expanded, setExpanded] = useState<Array<string>>([]);
 
     useEffect(() => {
-        const sendRequest = (): void => {
-            userService.getAggioToken().then((response) => {
-                var devicesList: { [key: string]: any } = {};
-                const requestResult = response.data.map((each: any) => {
-                    devicesList[each._id] = each;
-                    return createData(each._id, each.name, "available")
-                });
-                setDevices(devicesList);
-                if (rows !== requestResult) {
-
-                    setRows(requestResult);
-                    (render == 0) ? setRender(1) : setRender(0);
-                }
+        userService.getDevices4Admin().then((response) => {
+            console.log(response.data);
+            var devicesList: { [key: string]: any } = {};
+            const requestResult = response.data.map((each: any) => {
+                devicesList[each._id] = each.data;
+                return createData(each._id, each.name, "available")
             });
-            setTimeout(sendRequest, 5000);
-        };
-
-        const timeoutId = setTimeout(sendRequest, 0);
-
-        return (): void => {
-            clearTimeout(timeoutId);
-        };
+            setDevices(devicesList);
+            if (rows !== requestResult) {
+                setRows(requestResult);
+                (render == 0) ? setRender(1) : setRender(0);
+            }
+        });
     }, []);
 
     const handleRequestSort = (
