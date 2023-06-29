@@ -2519,7 +2519,7 @@ html,
         }
 
         .framer-ql2Mz .framer-ds4uio {
-            --framer-link-hover-text-color: rgba(153, 153, 153, .6);
+            --framer-link-hover-text-color: white;
             --framer-link-text-decoration: none;
             --framer-paragraph-spacing: 0px;
             flex: none;
@@ -2710,7 +2710,7 @@ html,
 
             .framer-ql2Mz .framer-vizkqz {
                 --border-bottom-width: 1px;
-                --border-color: rgba(0,0,50,0.8);
+                --border-color: white;
                 --border-left-width: 1px;
                 --border-right-width: 1px;
                 --border-style: solid;
@@ -2733,7 +2733,7 @@ html,
 
             .framer-ql2Mz .framer-ejh8ez {
                 --border-bottom-width: 1px;
-                --border-color: rgba(0,0,50,0.8);
+                --border-color: white;
                 --border-left-width: 1px;
                 --border-right-width: 1px;
                 --border-style: solid;

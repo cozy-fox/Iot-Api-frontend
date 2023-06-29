@@ -338,7 +338,7 @@ function LandingPage() {
                   </div>
                 </div>
                 <div className="framer-ds4uio" style={{ outline: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', flexShrink: 0, transform: 'none' }} data-framer-component-type="RichTextContainer">
-                  <p style={{ fontSelector: 'R0Y7TnVuaXRvLXJlZ3VsYXI=', fontFamily: '"Nunito", "Nunito Placeholder", sans-serif', lineHeight: '1.5em', textAlign: 'center' }} className="framer-text"><a href="https://www.netlinksdn.com" target="_blank">© NetLinkSDN 2023</a></p>
+                  <p style={{ fontSelector: 'R0Y7TnVuaXRvLXJlZ3VsYXI=', fontFamily: '"Nunito", "Nunito Placeholder", sans-serif', lineHeight: '1.5em', textAlign: 'center' }} className="framer-text"><a href="https://www.netlinksdn.com" target="_blank"><h3 style={{color:'black'}}>© NetLinkSDN 2023</h3></a></p>
                 </div>
               </div >
             </div >

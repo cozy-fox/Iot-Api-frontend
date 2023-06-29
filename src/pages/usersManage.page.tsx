@@ -305,6 +305,7 @@ const EnhancedTable: React.FC<Props> = () => {
 
     const getUsers = () => {
         userService.getUsers().then((response) => {
+            console.log(response.data);
             const requestResult = response.data.map((each: any) => {
                 return createData(each._id, each.username, each.group.length, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
             })
