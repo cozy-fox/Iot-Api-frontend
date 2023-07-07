@@ -29,6 +29,7 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
+import Children from '../components/children.component';
 type Props = {};
 
 const EnhancedTable: React.FC<Props> = () => {
@@ -280,6 +281,10 @@ const EnhancedTable: React.FC<Props> = () => {
     const [rows, setRows] = useState<Data[]>([]);
     const [render, setRender] = useState<Number>(0);
     const [open, setOpen] = React.useState(false);
+    const [input4newUser, setInput4newUser] = useState<string>('');
+    const [data4select, setData4select] = useState<{ devices: { label: string, value: string }[] }>
+    ({ devices: []});
+    const [indexedData, setIndexedData] = useState<any>({});
 
     const dialogOpen = () => {
         setOpen(true);
@@ -303,16 +308,35 @@ const EnhancedTable: React.FC<Props> = () => {
         });
     }
 
+    const updateUserGroups = (field: string, value: string, newMember: string) => {
+        userService.updateUser({ selected: selected[0], field: field, value: value, newMember: newMember }).then(response => {
+            setAlert({ message: response.data.message, successful: true, open: true });
+            getUsers();
+        }).catch(error => {
+            const resMessage = (error.response && error.response.data &&
+                error.response.data.message) || error.message || error.toString();
+            setAlert({ message: resMessage, successful: false, open: true });
+        });
+    }
+
     const getUsers = () => {
         userService.getUsers().then((response) => {
-            console.log(response.data);
+            var devicesList: { [key: string]: any } = {};
             const requestResult = response.data.map((each: any) => {
+                devicesList[each._id] = each;
                 return createData(each._id, each.username, each.group.length, each.email, each.role, each.allowed ? 'allowed' : 'disabled')
             })
+            setIndexedData(devicesList);
             if (rows !== requestResult) {
                 setRows(requestResult);
                 (render === 0) ? setRender(1) : setRender(0);
             }
+        })
+
+        userService.get4select().then((response) => {
+            setData4select({
+                devices: response.data.devices.map((each: { _id: any; name: any; }) => ({ value: each._id, label: each.name }))
+            });
         })
     }
     useEffect(() => {
@@ -386,9 +410,9 @@ const EnhancedTable: React.FC<Props> = () => {
     );
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid item md={12} lg={7}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ width: '100%' }}>
                             <Paper sx={{ width: '100%', mb: 2 }}>
@@ -441,7 +465,7 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         >
                                                             {row.name}
                                                         </TableCell>
-                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.connectedGroup}</TableCell>
+                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.connectedGroup} Groups</TableCell>
                                                         <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.email}</TableCell>
                                                         <TableCell align="right" onClick={(event) => setSelected([row.id])}>
                                                             <Chip label={row.role} color={row.role === 'user' ? 'primary' : 'secondary'} />
@@ -496,6 +520,18 @@ const EnhancedTable: React.FC<Props> = () => {
                             />
                         </Box>
                     </Paper>
+                </Grid>
+                <Grid item md={12} lg={5}>
+                    <Children
+                        title={"Device Groups"}
+                        addMember={(newValue: string) => { updateUserGroups("members", "add", newValue) }}
+                        deleteMember={(newValue: string) => { updateUserGroups("members", "delete", newValue) }}
+                        selected={selected}
+                        input4newMember={input4newUser}
+                        setinput4newMember={setInput4newUser}
+                        mainData={selected.length == 1 ? indexedData[selected[0]].group : null}
+                        data4selection={data4select.devices}
+                    />
                 </Grid>
             </Grid>
         </Container>

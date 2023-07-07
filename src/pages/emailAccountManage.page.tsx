@@ -19,7 +19,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Stack from '@mui/material/Stack';
 import { visuallyHidden } from '@mui/utils';
 import React, { useEffect, useState } from 'react';
-import userService from '../services/user.service';
+import adminService from '../services/admin.service';
 import Button from '@mui/material/Button';
 import Alert from "../components/alert.component";
 import Dialog from '@mui/material/Dialog';
@@ -29,58 +29,41 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import Children from '../components/children.component';
+
+import DialogChild from "../components/emailDialog.component";
 
 type Props = {};
-type Order = 'asc' | 'desc';
-interface Data {
-    id: string;
-    name: string;
-    members: number;
-    devices: number;
-}
-interface HeadCell {
-    disablePadding: boolean;
-    id: keyof Data;
-    label: string;
-    numeric: boolean;
-}
-interface EnhancedTableProps {
-    numSelected: number;
-    onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-    onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    order: Order;
-    orderBy: string;
-    rowCount: number;
-}
-interface EnhancedTableToolbarProps {
-    numSelected: ReadonlyArray<string>;
-}
-
 
 const EnhancedTable: React.FC<Props> = () => {
-    const [order, setOrder] = React.useState<Order>('asc');
-    const [orderBy, setOrderBy] = React.useState<keyof Data>('name');
-    const [selected, setSelected] = React.useState<readonly string[]>([]);
-    const [page, setPage] = React.useState(0);
-    const [dense, setDense] = React.useState(false);
-    const [rowsPerPage, setRowsPerPage] = React.useState(20);
-    const [rows, setRows] = useState<Data[]>([]);
-    const [render, setRender] = useState<Number>(0);
-    const [open, setDialogOpen] = React.useState(false);
-    const [inputValue, setInputValue] = useState<string>('');
     const [alert, setAlert] = useState({ message: '', successful: true, open: false });
-    const [indexedData, setIndexedData] = useState<any>({});
-    const [data4select, setData4select] = useState<{ devices: { label: string, value: string }[], users: { label: string, value: string }[] }>
-        ({ devices: [], users: [] });
-    const [input4newUser, setInput4newUser] = useState<string>('');
-    const [input4addDeviceGroup, setinput4addDeviceGroup] = useState<string>('');
 
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         setAlert({ ...alert, open: false });
     };
+    interface Data {
+        id: string;
+        name: string;
+        password: string;
+        service: string;
+        selected:string;
+    }
+
+    function createData(
+        id: string,
+        name: string,
+        password: string,
+        service: string,
+        selected : string
+    ): Data {
+        return {
+            id,
+            name,
+            password,
+            service,
+            selected
+        };
+    }
+
 
     function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
         if (b[orderBy] < a[orderBy]) {
@@ -91,6 +74,8 @@ const EnhancedTable: React.FC<Props> = () => {
         }
         return 0;
     }
+
+    type Order = 'asc' | 'desc';
 
     function getComparator<Key extends keyof any>(
         order: Order,
@@ -104,19 +89,6 @@ const EnhancedTable: React.FC<Props> = () => {
             : (a, b) => -descendingComparator(a, b, orderBy);
     }
 
-    function createData(
-        id: string,
-        name: string,
-        members: number,
-        devices: number
-    ): Data {
-        return {
-            id,
-            name,
-            members,
-            devices
-        };
-    }
 
     function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
         const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
@@ -130,26 +102,45 @@ const EnhancedTable: React.FC<Props> = () => {
         return stabilizedThis.map((el) => el[0]);
     }
 
+    interface HeadCell {
+        disablePadding: boolean;
+        id: keyof Data;
+        label: string;
+        numeric: boolean;
+    }
+
     const headCells: readonly HeadCell[] = [
         {
             id: 'name',
             numeric: false,
             disablePadding: true,
-            label: 'Name',
-        },
-        {
-            id: 'members',
+            label: 'UserId',
+        }, {
+            id: 'password',
+            numeric: true,
+            disablePadding: true,
+            label: 'Password',
+        }, {
+            id: 'service',
             numeric: true,
             disablePadding: false,
-            label: 'Users',
-        },
-        {
-            id: 'devices',
+            label: 'Service',
+        }, {
+            id: 'selected',
             numeric: true,
             disablePadding: false,
-            label: 'Device Groups',
+            label: 'Is Selected?',
         }
     ];
+
+    interface EnhancedTableProps {
+        numSelected: number;
+        onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
+        onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
+        order: Order;
+        orderBy: string;
+        rowCount: number;
+    }
 
     function EnhancedTableHead(props: EnhancedTableProps) {
         const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
@@ -199,37 +190,108 @@ const EnhancedTable: React.FC<Props> = () => {
         );
     }
 
-    const updateUserGroups = (field: string, value: string, newMember: string) => {
-       
+    interface EnhancedTableToolbarProps {
+        numSelected: ReadonlyArray<string>;
     }
 
-    const rename = () => {
-        userService.renameGroup({ selectedUsers: selected, newName: inputValue }).then(response => {
-            setAlert({ message: response.data.message, successful: true, open: true });
-            getGroups();
-            setSelected([]);
-            setInputValue('');
-        }).catch(error => {
-            const resMessage = (error.response && error.response.data &&
-                error.response.data.message) || error.message || error.toString();
-            setAlert({ message: resMessage, successful: false, open: true });
-        });
+    function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
+        const { numSelected } = props;
+
+        return (
+            <Toolbar
+                sx={{
+                    pl: { sm: 2 },
+                    pr: { xs: 1, sm: 1 },
+                    ...(numSelected.length > 0 && {
+                        bgcolor: (theme) =>
+                            alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                    }),
+                }}
+            >
+                {numSelected.length > 0 ? (
+                    <Typography
+                        sx={{ flex: '1 1 100%' }}
+                        color="inherit"
+                        variant="subtitle1"
+                        component="div"
+                    >
+                        {numSelected.length} selected
+                    </Typography>
+                ) : (
+                    <Typography
+                        sx={{ flex: '1 1 100%' }}
+                        variant="h6"
+                        id="tableTitle"
+                        component="div"
+                    >
+                        Email Account Management
+                    </Typography>
+                )}
+
+                <Stack direction="row" spacing={2}>
+                    <Button variant="contained" onClick={()=>{
+                        setDialogType('Create');
+                        setName('');
+                        setPassword('');
+                        setService('');
+                        setCreateDialogOpen(true); 
+                        }}>Create</Button>
+                </Stack>
+
+                <Tooltip title="Delete">
+                    <IconButton disabled={numSelected.length === 0} onClick={dialogOpen}>
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
+
+            </Toolbar>
+        );
     }
+
+    const [order, setOrder] = React.useState<Order>('asc');
+    const [orderBy, setOrderBy] = React.useState<keyof Data>('name');
+    const [dialogType, setDialogType] = React.useState<string>('Create');
+    const [selected, setSelected] = React.useState<readonly string[]>([]);
+    const [page, setPage] = React.useState(0);
+    const [dense, setDense] = React.useState(false);
+    const [rowsPerPage, setRowsPerPage] = React.useState(20);
+    const [rows, setRows] = useState<Data[]>([]);
+    const [render, setRender] = useState<Number>(0);
+    const [open, setDeleteDialogOpen] = React.useState(false);
+    const [dialogChildOpen, setCreateDialogOpen]=useState(false);
+    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+    const [service, setService] = useState('');
+    const [accountSelected, setAccountSelected] = useState(false);
+    const [indexedData, setIndexedData] = useState<any>({});
+
 
     const dialogOpen = () => {
-        setDialogOpen(true);
+        setDeleteDialogOpen(true);
     };
 
     const dialogClose = () => {
-        setDialogOpen(false);
+        setDeleteDialogOpen(false);
     };
 
-    const deleteGroup = () => {
-        userService.deleteUserGroups(selected).then(response => {
+    const createAccount=()=>{
+        adminService.createEmailAccount(name, password, service).then((response) => {
             setAlert({ message: response.data.message, successful: true, open: true });
-            dialogClose();
+            getAccount();
+            setCreateDialogOpen(false);
+        }).catch(error => {
+            const resMessage = (error.response && error.response.data &&
+                error.response.data.message) || error.message || error.toString();
+            setAlert({ message: resMessage, successful: false, open: true });
+        });
+    }
+
+    const deleteUsers = () => {
+        adminService.deleteEmailAccount(selected).then(response => {
+            setAlert({ message: response.data.message, successful: true, open: true });
+            setDeleteDialogOpen(false);
             setSelected([]);
-            getGroups();
+            getAccount();
 
         }).catch(error => {
             const resMessage = (error.response && error.response.data &&
@@ -238,24 +300,12 @@ const EnhancedTable: React.FC<Props> = () => {
         });
     }
 
-    const createGroup = () => {
-        userService.createUserGroup(inputValue).then((response) => {
-            setAlert({ message: response.data.message, successful: true, open: true });
-            setInputValue('');
-            getGroups();
-        }).catch(error => {
-            const resMessage = (error.response && error.response.data &&
-                error.response.data.message) || error.message || error.toString();
-            setAlert({ message: resMessage, successful: false, open: true });
-        });
-    }
-
-    const getGroups = () => {
-        userService.getUserGroups().then((response) => {
+    const getAccount = () => {
+        adminService.getEmailAccount().then((response) => {
             var devicesList: { [key: string]: any } = {};
             const requestResult = response.data.map((each: any) => {
                 devicesList[each._id] = each;
-                return createData(each._id, each.name, each.members.length, each.reference2devicegroup.length)
+                return createData(each._id, each.name, each.password, each.service, each.selected?'selected':'');
             })
             setIndexedData(devicesList);
             if (rows !== requestResult) {
@@ -263,17 +313,24 @@ const EnhancedTable: React.FC<Props> = () => {
                 (render === 0) ? setRender(1) : setRender(0);
             }
         })
-        userService.get4select().then((response) => {
-            setData4select({
-                users: response.data.users.map((each: { _id: any; username: any; }) => ({ value: each._id, label: each.username })),
-                devices: response.data.devices.map((each: { _id: any; name: any; }) => ({ value: each._id, label: each.name }))
-            });
-        })
+    }
+    useEffect(() => {
+        getAccount();
+    }, []);
+
+    const update = () => {
+        adminService.updateEmailData(selected[0], name, password, service, accountSelected ).then(response => {
+            setAlert({ message: response.data.message, successful: true, open: true });
+            getAccount();
+            setCreateDialogOpen(false);
+            setSelected([]);
+        }).catch(error => {
+            const resMessage = (error.response && error.response.data &&
+                error.response.data.message) || error.message || error.toString();
+            setAlert({ message: resMessage, successful: false, open: true });
+        });
     }
 
-    useEffect(() => {
-        getGroups();
-    }, []);
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
@@ -292,6 +349,16 @@ const EnhancedTable: React.FC<Props> = () => {
         }
         setSelected([]);
     };
+
+    const selectOne=(id:string)=>{
+        setSelected([id]);
+        setName(indexedData[id].name);
+        setService(indexedData[id].service);
+        setAccountSelected(indexedData[id].selected)
+        setPassword('');
+        setDialogType('Update');
+        setCreateDialogOpen(true);
+    }
 
     const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
         const selectedIndex = selected.indexOf(name);
@@ -328,6 +395,7 @@ const EnhancedTable: React.FC<Props> = () => {
 
     const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
+    // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
@@ -343,50 +411,15 @@ const EnhancedTable: React.FC<Props> = () => {
     return (
         <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-                <Grid item md={12} lg={6}>
+                <Grid item md={12}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ width: '100%' }}>
                             <Paper sx={{ width: '100%', mb: 2 }}>
                                 <Alert message={alert.message} successful={alert.successful} open={alert.open} handleClose={handleClose} />
-                                <Toolbar
-                                    sx={{
-                                        pl: { sm: 2 },
-                                        pr: { xs: 1, sm: 1 },
-                                        ...(selected.length > 0 && {
-                                            bgcolor: (theme) =>
-                                                alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-                                        }),
-                                    }}
-                                >
-                                    <Typography
-                                        sx={{ flex: '1 1 100%' }}
-                                        color="inherit"
-                                        variant="subtitle1"
-                                        component="div"
-                                    >
-                                        {selected.length > 0 ? `${selected.length} selected` : 'User Group Management'}
-                                    </Typography>
-                                    <Stack direction="row" spacing={2}>
-                                        <TextField id="outlined-basic" variant="outlined" size='small'
-                                            value={inputValue}
-                                            onChange={(event) => { setInputValue(event.target.value); }} />
-
-                                        <Button variant="contained" color="success" onClick={() => createGroup()}  >
-                                            Create
-                                        </Button>
-                                        <Button variant="contained" color="primary" disabled={selected.length === 0} onClick={() => rename()}>
-                                            Rename
-                                        </Button>
-                                    </Stack>
-                                    <Tooltip title="Delete">
-                                        <IconButton disabled={selected.length === 0} onClick={dialogOpen}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Toolbar>
+                                <EnhancedTableToolbar numSelected={selected} />
                                 <TableContainer>
                                     <Table
-                                        sx={{ minWidth: 250 }}
+                                        sx={{ minWidth: 750 }}
                                         aria-labelledby="tableTitle"
                                         size={dense ? 'small' : 'medium'}
                                     >
@@ -398,10 +431,12 @@ const EnhancedTable: React.FC<Props> = () => {
                                             onRequestSort={handleRequestSort}
                                             rowCount={rows.length}
                                         />
+
                                         <TableBody>
                                             {visibleRows.map((row, index) => {
                                                 const isItemSelected = isSelected(row.id);
                                                 const labelId = `enhanced-table-checkbox-${index}`;
+
                                                 return (
                                                     <TableRow
                                                         hover
@@ -421,7 +456,7 @@ const EnhancedTable: React.FC<Props> = () => {
                                                                 }}
                                                             />
                                                         </TableCell>
-                                                        <TableCell onClick={(event) => setSelected([row.id])}
+                                                        <TableCell onClick={(event) => selectOne(row.id)}
                                                             component="th"
                                                             id={labelId}
                                                             scope="row"
@@ -429,8 +464,11 @@ const EnhancedTable: React.FC<Props> = () => {
                                                         >
                                                             {row.name}
                                                         </TableCell>
-                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.members}</TableCell>
-                                                        <TableCell align="right" onClick={(event) => setSelected([row.id])}>{row.devices}</TableCell>
+                                                        <TableCell align="right" onClick={(event) => selectOne(row.id)}>{row.password}</TableCell>
+                                                        <TableCell align="right" onClick={(event) => selectOne(row.id)}>{row.service}</TableCell>
+                                                        <TableCell align="right" onClick={(event) => selectOne(row.id)}>
+                                                            {row.selected===''?'':<Chip label={"Selected"} color={'success'} />}
+                                                        </TableCell>
                                                     </TableRow>
                                                 );
                                             })}
@@ -463,45 +501,33 @@ const EnhancedTable: React.FC<Props> = () => {
                                 aria-describedby="alert-dialog-description"
                             >
                                 <DialogTitle id="alert-dialog-title">
-                                    {"Do you really want to delete those groups?"}
+                                    {"Do you really want to delete those users?"}
                                 </DialogTitle>
                                 <DialogActions>
-                                    <Button onClick={deleteGroup}>Yes</Button>
+                                    <Button onClick={deleteUsers}>Yes</Button>
                                     <Button onClick={dialogClose} autoFocus>
                                         No
                                     </Button>
                                 </DialogActions>
                             </Dialog>
+                            
+                            <DialogChild
+                                name={name} setName={setName}
+                                password={password} setPassword={setPassword}
+                                service={service} setService={setService}
+                                accountSelected={accountSelected} setAccountSelected={setAccountSelected}
+                                open={dialogChildOpen}
+                                handleClose={()=>{setCreateDialogOpen(false);}}
+                                handleClick={dialogType==='Update'?update:createAccount}
+                                type={dialogType}
+                            ></DialogChild>
+
                             <FormControlLabel
                                 control={<Switch checked={dense} onChange={handleChangeDense} />}
                                 label="Dense padding"
                             />
                         </Box>
-
                     </Paper>
-                </Grid>
-                <Grid item md={12} lg={6}>
-                    <Children
-                        title={"Users"}
-                        addMember={(newValue: string) => { updateUserGroups("members", "add", newValue) }}
-                        deleteMember={(newValue: string) => { updateUserGroups("members", "delete", newValue) }}
-                        selected={selected}
-                        input4newMember={input4newUser}
-                        setinput4newMember={setInput4newUser}
-                        mainData={selected.length == 1 ? indexedData[selected[0]].members : null}
-                        data4selection={data4select.users}
-                    />
-                    <br />
-                    <Children
-                        title={"Related Device Group"}
-                        addMember={(newValue: string) => { updateUserGroups("userGroup", "add", newValue) }}
-                        deleteMember={(newValue: string) => { updateUserGroups("userGroup", "delete", newValue) }}
-                        selected={selected}
-                        input4newMember={input4addDeviceGroup}
-                        setinput4newMember={setinput4addDeviceGroup}
-                        mainData={selected.length == 1 ? indexedData[selected[0]].reference2devicegroup : null}
-                        data4selection={data4select.devices}
-                    />
                 </Grid>
             </Grid>
         </Container>

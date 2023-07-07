@@ -1,8 +1,8 @@
 import axios from 'axios';
 import authHeader from './auth-header';
 
-const API_URL = 'http://192.168.127.74:8080/api';
-
+import config from './../config';
+const API_URL = config.backend;
 class DeviceService {
 
   getDevices() {

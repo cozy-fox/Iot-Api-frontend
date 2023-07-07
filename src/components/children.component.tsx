@@ -7,6 +7,7 @@ import Chip from '@mui/material/Chip';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
+import { wrap } from 'module';
 
 
 export default function Dashboard
@@ -20,22 +21,23 @@ export default function Dashboard
         mainData,
         data4selection
     }: {
-        title:string,
+        title: string,
         addMember: any,
-        deleteMember:any,
-        selected:readonly string[],
+        deleteMember: any,
+        selected: readonly string[],
         input4newMember: string,
         setinput4newMember: (newValue: string) => void,
         mainData: any,
         data4selection: Array<any>
     }) {
     return (<Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ width: '100%', minHeight: '300px' }}>
+        <Box sx={{ width: '100%', minHeight: '300px' }} flexWrap="wrap">
             <Toolbar
                 sx={{
                     pl: { sm: 2 },
                     pr: { xs: 1, sm: 1 }
                 }}
+
             >
                 <Typography
                     sx={{ flex: '1 1 100%' }}
@@ -43,7 +45,7 @@ export default function Dashboard
                     variant="subtitle1"
                     component="div"
                 >
-                   {title}
+                    {title}
                 </Typography>
                 {selected.length === 1 ? <Stack direction="row" spacing={2}>
                     <Autocomplete
@@ -65,7 +67,7 @@ export default function Dashboard
             <Stack direction="row" spacing={1} flexWrap="wrap" >
                 {selected.length == 1 && mainData.length > 0 ?
                     mainData.map((each: any) =>
-                        <Chip label={each.name||each.username} sx={{ mb: 1 }} variant="outlined" color="primary" onDelete={() => {deleteMember(each._id) }} />)
+                        <Chip label={each.name || each.username} sx={{ mb: 1 }} variant="outlined" color="primary" onDelete={() => { deleteMember(each._id) }} />)
                     : ''}
             </Stack>
 

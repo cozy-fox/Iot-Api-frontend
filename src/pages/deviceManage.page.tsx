@@ -29,14 +29,14 @@ import Chip from '@mui/material/Chip';
 interface Data {
     deviceId: string;
     name: string;
-    connectedGroup: number,
+    connectedGroup: string,
     status: string;
 }
 
 function createData(
     deviceId: string,
     name: string,
-    connectedGroup: number,
+    connectedGroup: string,
     status: string
 ): Data {
     return {
@@ -224,9 +224,10 @@ export default function EnhancedTable() {
     useEffect(() => {
         userService.getDevices().then((response) => {
             var devicesList: { [key: string]: any } = {};
+            console.log(response.data);
             const requestResult = response.data.map((each: any) => {
                 devicesList[each._id] = each.data;
-                return createData(each._id, each.name, each.group.length, each.status)
+                return createData(each._id, each.name, each.group?each.group.name:'', each.status)
             });
             setDevices(devicesList);
             if (rows !== requestResult) {

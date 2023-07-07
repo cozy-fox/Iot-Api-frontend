@@ -144,7 +144,7 @@ const EnhancedTable: React.FC<Props> = () => {
             id: 'devices',
             numeric: true,
             disablePadding: false,
-            label: 'User Groups',
+            label: 'Allowed Users',
         }
     ];
 
@@ -256,10 +256,11 @@ const EnhancedTable: React.FC<Props> = () => {
 
     const getGroups = () => {
         deviceService.getDeviceGroups().then((response) => {
+            console.log(response.data);
             var devicesList: { [key: string]: any } = {};
             const requestResult = response.data.map((each: any) => {
                 devicesList[each._id] = each;
-                return createData(each._id, each.name, each.members.length, each.reference2usergroup.length)
+                return createData(each._id, each.name, each.members.length, each.reference2user.length)
             })
             setIndexedData(devicesList);
             if (rows !== requestResult) {
@@ -269,8 +270,9 @@ const EnhancedTable: React.FC<Props> = () => {
         })
         deviceService.get4select().then((response) => {
             setData4select({
-                users: response.data.users.map((each: { _id: any; name: any; }) => ({ value: each._id, label: each.name })),
-                devices: response.data.devices.map((each: { _id: any; name: any; }) => ({ value: each._id, label: each.name }))
+                users: response.data.users.map((each: { _id: any; username: any; }) => ({ value: each._id, label: each.username })),
+                devices: response.data.devices.filter((each:any)=>(each.group===undefined)||(each.group===null))
+                .map((each: any) => ({ value: each._id, label: each.name, }))
             });
         })
     }
@@ -496,13 +498,13 @@ const EnhancedTable: React.FC<Props> = () => {
                     />
                     <br />
                     <Children
-                        title={"Related User Groups"}
+                        title={"Allowed User"}
                         addMember={(newValue: string) => { updateUserGroups("userGroup", "add", newValue) }}
                         deleteMember={(newValue: string) => { updateUserGroups("userGroup", "delete", newValue) }}
                         selected={selected}
                         input4newMember={input4newUser}
                         setinput4newMember={setinput4newUser}
-                        mainData={selected.length == 1 ? indexedData[selected[0]].reference2usergroup : null}
+                        mainData={selected.length == 1 ? indexedData[selected[0]].reference2user : null}
                         data4selection={data4select.users}
                     />
                 </Grid>

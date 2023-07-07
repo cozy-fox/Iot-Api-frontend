@@ -28,27 +28,18 @@ const SignUp: React.FC<Props> = () => {
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         setAlert({ ...alert, open: false });
     };
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const username: any = data.get('username');
         const email: any = data.get('email');
-        const password: any = data.get('password');
-        const checkPassword: any = data.get('checkPassword');
 
-        if (typeof (username) !== 'string' || username.length < 3) {
-            setAlert({ message: 'Username must be over 3 letters', successful: false, open: true });
-        } else if (typeof (email) !== 'string' || email.length === 0 || !email.includes('@')) {
+        if (typeof (email) !== 'string' || email.length === 0 || !email.includes('@')) {
             setAlert({ message: 'Invalid Email', successful: false, open: true });
-        } else if (typeof (password) !== 'string' || password.length < 8) {
-            setAlert({ message: 'Password should be over 8 letters', successful: false, open: true });
-        } else if (typeof (checkPassword) !== 'string' || checkPassword != password) {
-            setAlert({ message: 'Password Unmatch', successful: false, open: true });
         } else {
-            AuthService.register(username, email, password).then(
+            AuthService.forgotPassword(email).then(
                 response => {
                     setAlert({ message: response.data.message, successful: true, open: true });
-                    navigate('/login', { replace: true });
                 },
                 error => {
                     setAlert({
@@ -77,27 +68,12 @@ const SignUp: React.FC<Props> = () => {
                         }}
                     >
                         <Paper sx={{ mt: '120px', padding: '40px' }}>
-
                             <div className='logo'><img src='logo.png' style={{ width: '50%', marginBottom: '20px', cursor: 'pointer' }} onClick={() => { navigate('/') }}></img></div>
-
-
-
                             <Typography component="h1" variant="h5" align='center'>
-                                Sign up
+                                Forgot Password?
                             </Typography>
                             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                                 <Grid container spacing={2}>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            autoComplete="Username"
-                                            name="username"
-                                            required
-                                            fullWidth
-                                            id="username"
-                                            label="UserName"
-                                            autoFocus
-                                        />
-                                    </Grid>
                                     <Grid item xs={12}>
                                         <TextField
                                             required
@@ -108,28 +84,6 @@ const SignUp: React.FC<Props> = () => {
                                             autoComplete="email"
                                         />
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            name="password"
-                                            label="Password"
-                                            type="password"
-                                            id="password"
-                                            autoComplete="new-password"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            name="checkPassword"
-                                            label="Check Password"
-                                            type="password"
-                                            id="checkPassword"
-                                            autoComplete="new-password"
-                                        />
-                                    </Grid>
                                 </Grid>
                                 <Button
                                     type="submit"
@@ -137,7 +91,7 @@ const SignUp: React.FC<Props> = () => {
                                     variant="contained"
                                     sx={{ mt: 3, mb: 2 }}
                                 >
-                                    Sign Up
+                                    Send Email
                                 </Button>
                                 <Grid container justifyContent="flex-end">
                                     <Grid item>

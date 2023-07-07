@@ -5,6 +5,8 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import PowerIcon from '@mui/icons-material/Power';
 import PeopleIcon from '@mui/icons-material/People';
+import ContactMailIcon from '@mui/icons-material/ContactMail';
+import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputComponent';
 import AssignmentIcon from '@mui/icons-material/Assignment';
@@ -37,13 +39,29 @@ export const MainListItems = () => {
       </ListItemButton>
       : <></>}
       {authService.getCurrentUser().roles === 'admin' ?
+      <ListItemButton onClick={() => { navigate('/yggio_account') }}>
+        <ListItemIcon>
+          <PrecisionManufacturingIcon />
+        </ListItemIcon>
+        <ListItemText primary="Yggio Accounts" />
+      </ListItemButton>
+      : <></>}
+      {authService.getCurrentUser().roles === 'admin' ?
+      <ListItemButton onClick={() => { navigate('/email_account') }}>
+        <ListItemIcon>
+          <ContactMailIcon />
+        </ListItemIcon>
+        <ListItemText primary="Email Accounts" />
+      </ListItemButton>
+      : <></>}
+      {/* {authService.getCurrentUser().roles === 'admin' ?
       <ListItemButton onClick={() => { navigate('/user_group') }}>
         <ListItemIcon>
         <PeopleIcon />
         </ListItemIcon>
         <ListItemText primary="User Group" />
       </ListItemButton>
-      : <></>}
+      : <></>} */}
   </React.Fragment>)
 };
 

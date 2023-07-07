@@ -1,8 +1,8 @@
 import axios from 'axios';
 import authHeader from './auth-header';
 
-const API_URL = 'http://192.168.127.74:8080/api';
-
+import config from './../config';
+const API_URL = config.backend;
 class UserService {
   getUsers() {
     return axios.get(API_URL + '/users', { headers: authHeader() });
@@ -33,7 +33,7 @@ class UserService {
     return axios.put(API_URL + '/user_group/name',  { selectedGroups: selectedUsers, newName: newName }, {headers: authHeader() });
   }
 
-  updateUserGroups({ selected, field, value, newMember }: { selected:string, field: string,value:string, newMember: string }) {
+  updateUser({ selected, field, value, newMember }: { selected:string, field: string,value:string, newMember: string }) {
     return axios.put(API_URL + '/user_group',  { selected:selected, field: field,value:value, newMember: newMember }, {headers: authHeader() });
   }
 

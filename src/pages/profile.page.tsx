@@ -28,7 +28,6 @@ const SignUp: React.FC<Props> = () => {
             setUsername(response.data.username);
             setEmail(response.data.email);
             setUserGroups(response.data.userGroup);
-            setDeviceGroups(response.data.deviceGroup);
         }).catch(error => {
             const resMessage = (error.response && error.response.data &&
                 error.response.data.message) || error.message || error.toString();
@@ -153,17 +152,10 @@ const SignUp: React.FC<Props> = () => {
                                 <h3>User Groups</h3>
                             </Grid>
                             <Grid sm={12}>
-                                {userGroups.map((each: any) => <Chip label={each} sx={{ mb: 1, mr:2 }} variant="outlined" color="primary" />)}
+                                {userGroups.map((each: any) => <Chip label={each.name} sx={{ mb: 1, mr:2 }} variant="outlined" color="primary" />)}
                             </Grid>
                         </Paper>
-                        <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', minHeight: "200px", mb: '10px' }}>
-                            <Grid sm={12}>
-                                <h3>Device Groups</h3>
-                            </Grid>
-                            <Grid sm={12}>
-                                {deviceGroups.map((each: any) => <Chip label={each} sx={{ mb: 1, mr:2 }} variant="outlined" color="primary" />)}
-                            </Grid>
-                        </Paper>
+                        
                     </Grid>
                 </Grid>
             </Container>
