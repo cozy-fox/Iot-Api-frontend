@@ -28,6 +28,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import deviceService from '../services/device.service';
 import Chip from '@mui/material/Chip';
 import Children from '../components/children.component';
 type Props = {};
@@ -309,7 +310,7 @@ const EnhancedTable: React.FC<Props> = () => {
     }
 
     const updateUserGroups = (field: string, value: string, newMember: string) => {
-        userService.updateUser({ selected: selected[0], field: field, value: value, newMember: newMember }).then(response => {
+        deviceService.updateDeviceGroups({ selected:newMember , field: field, value: value, newMember: selected[0] }).then(response => {
             setAlert({ message: response.data.message, successful: true, open: true });
             getUsers();
         }).catch(error => {
@@ -524,8 +525,8 @@ const EnhancedTable: React.FC<Props> = () => {
                 <Grid item md={12} lg={5}>
                     <Children
                         title={"Device Groups"}
-                        addMember={(newValue: string) => { updateUserGroups("members", "add", newValue) }}
-                        deleteMember={(newValue: string) => { updateUserGroups("members", "delete", newValue) }}
+                        addMember={(newValue: string) => { updateUserGroups("userGroup", "add", newValue) }}
+                        deleteMember={(newValue: string) => { updateUserGroups("userGroup", "delete", newValue) }}
                         selected={selected}
                         input4newMember={input4newUser}
                         setinput4newMember={setInput4newUser}
