@@ -17,14 +17,14 @@ function LandingPage() {
                     <div className="ssr-variant">
                       <div className="framer-1imnr1g" style={{ outline: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', flexShrink: 0, transform: 'none' }} data-framer-component-type="RichTextContainer" viewbox="0 0 115 32">
                         <div width="100%" height="100%" transform="scale(1)" style={{ overflow: 'visible', transformOrigin: 'center center' }}>
-                          <h1 style={{ fontSelector: 'R0Y7Qm93bGJ5IE9uZS1yZWd1bGFy', fontFamily: '"Bowlby One", sans-serif', fontSize: '142px', lineHeight: '1em', textAlign: 'left', color: 'rgb(255, 255, 255)', TextTransform: 'uppercase' }} className="framer-text">Yggio</h1>
+                          <h1 style={{ fontSelector: 'R0Y7Qm93bGJ5IE9uZS1yZWd1bGFy', fontFamily: '"Bowlby One", sans-serif', fontSize: '112px', lineHeight: '1em', textAlign: 'left', color: 'rgb(255, 255, 255)', TextTransform: 'uppercase' }} className="framer-text">Netlink</h1>
                         </div>
                       </div>
                     </div>
                     <div className="ssr-variant">
                       <div className="framer-1xgp24w" style={{ outline: 'none', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', flexShrink: 0, transform: 'none' }} data-framer-component-type="RichTextContainer" viewbox="0 0 28 20">
                         <div width="100%" height="100%" transform="scale(1)" style={{ overflow: 'visible', transformOrigin: 'center center' }}>
-                          <p style={{ fontSelector: 'R0Y7TnVuaXRvLXJlZ3VsYXI=', fontFamily: 'Bowlby One', fontSize: '120px', lineHeight: '2em', textAlign: 'left', color: 'rgb(255, 255, 255)' }} className="framer-text">IoT</p>
+                          <p style={{ fontSelector: 'R0Y7TnVuaXRvLXJlZ3VsYXI=', fontFamily: 'Bowlby One', fontSize: '110px', lineHeight: '2em', textAlign: 'left', color: 'rgb(255, 255, 255)' }} className="framer-text">IoT</p>
                         </div>
                       </div>
                     </div>
